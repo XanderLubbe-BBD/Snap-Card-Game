@@ -1,1 +1,1 @@
-# Snap-Card-Game-
+# Snap (Card Game)
