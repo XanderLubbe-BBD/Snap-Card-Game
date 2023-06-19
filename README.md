@@ -41,7 +41,10 @@ Because our front-end and back-end communicate through web socket messages, I th
 
 ### Running locally
 
-1. Run `npm start` in the "api" directory.
-2. Run `npm start` in the "server" directory.
-3. Run `npm start` in the "app" directory.
-4. Open browser to [http://localhost:8080/](http://localhost:8080/)
+1. Run `npm install` in the "api" directory.
+2. Run `npm install` in the "server" directory.
+3. Run `npm install` in the "app" directory.
+4. Run `npm start` in the "api" directory.
+5. Run `npm start` in the "server" directory.
+6. Run `npm start` in the "app" directory.
+7. Open browser to [http://localhost:8080/](http://localhost:8080/)
