@@ -1,5 +1,7 @@
 import { WebSocketServer } from 'ws';
 
+// TODO: implement secure web sockets (required when accessing fron-end through https)
+
 const wss = new WebSocketServer({ port: 8081 });
 
 function sendMessage(msg, client = null) {
