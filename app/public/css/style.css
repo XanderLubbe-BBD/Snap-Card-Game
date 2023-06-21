@@ -305,15 +305,15 @@ input.code {
     font-size: 48px;
     font-family: 'Courier New', Courier, monospace;
     font-weight: 800;
-    color: #380036;
+    color: white;
     margin: 0 2px;
     text-transform: uppercase;
 }
 
 #digit-group input:focus {
-    outline: 2px solid #380036;
+    outline: 2px solid white;
 }
 
 .filled-in {
-    outline: 2px solid #380036;
+    outline: 2px solid white;
 }
