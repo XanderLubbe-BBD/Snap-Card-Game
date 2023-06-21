@@ -26,6 +26,13 @@ footer {
     padding: 1rem;
     text-align: center;
     color: white;
+    transform: translateY(0px);
+    transition: all ease 1s;
+}
+
+header {
+    transform: translateY(0px);
+    transition: all ease 1s;
 }
 
 button,
@@ -173,7 +180,8 @@ main .box {
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-radius: .7rem;
-    transition: all ease .3s;
+    transform: translateY(0px);
+    transition: all ease 1s;
 }
 
 main .box {

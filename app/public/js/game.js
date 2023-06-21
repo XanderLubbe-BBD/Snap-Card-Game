@@ -148,11 +148,21 @@ function addJoinElements() {
 function startGame(){
     clearPage();
 
-    
+
 }
 
 function clearPage(){
-    document.getElementsByClassName("box")[0].remove();
-    document.getElementsByTagName("footer")[0].remove();
-    document.getElementsByTagName("header")[0].remove();
+    document.getElementsByClassName("box")[0].style.transform = "translateY(100px)";
+    document.getElementsByTagName("footer")[0].style.transform = "translateY(100px)";
+    document.getElementsByTagName("header")[0].style.transform = "translateY(100px)";
+
+    document.getElementsByClassName("box")[0].style.opacity = "0";
+    document.getElementsByTagName("footer")[0].style.opacity = "0";
+    document.getElementsByTagName("header")[0].style.opacity = "0";
+
+    setTimeout(() => {
+        document.getElementsByClassName("box")[0].remove();
+        document.getElementsByTagName("footer")[0].remove();
+        document.getElementsByTagName("header")[0].remove();
+    }, 1000);
 }
