@@ -4,7 +4,35 @@ ws.addEventListener("open", () => {
 });
 
 ws.addEventListener('message', function (event) {
-    document.getElementById("response").innerHTML = event.data;
+    document.getElementById("response").innerText = event.data;
+});
+
+document.getElementById("createLobby").addEventListener("click", function () {
+    let message = document.getElementById("input").value;
+    let data = {
+        "type": "create",
+        "player": {"id": 0}
+    }
+    ws.send(JSON.stringify(data));
+});
+
+document.getElementById("joinLobby").addEventListener("click", function () {
+    let message = document.getElementById("input").value;
+    let data = {
+        "type": "join",
+        "joinCode": message,
+        "player": {"id": 1}
+    }
+    ws.send(JSON.stringify(data));
+});
+
+document.getElementById("leaveLobby").addEventListener("click", function () {
+    let message = document.getElementById("input").value;
+    let data = {
+        "type": "leave",
+        "joinCode": message,
+    }
+    ws.send(JSON.stringify(data));
 });
 
 document.getElementById("respond").addEventListener("click", function () {
@@ -29,6 +57,15 @@ document.getElementById("requestNames").addEventListener("click", function () {
     let data = {
         "type": "request",
         "endpoint": "names"
+    }
+    ws.send(JSON.stringify(data));
+});
+
+document.getElementById("startGame").addEventListener("click", function () {
+    let message = document.getElementById("input").value;
+    let data = {
+        "type": "start",
+        "joinCode": message
     }
     ws.send(JSON.stringify(data));
 });
