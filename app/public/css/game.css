@@ -1,0 +1,231 @@
+#playerList li:first-child {
+    font-weight: bold;
+    border-bottom: white 1px solid;
+    width: 80%;
+    padding-bottom: 1em;
+}
+
+.my-cards {
+    position: absolute;
+    bottom: 100px;
+    left: calc(50% - 169.5px/2);
+    height: 235.5px;
+    width: 169.5;
+    transform: rotateX(0deg);
+}
+
+.my-cards img {
+    height: 235.5px;
+    width: 169.5px;
+}
+
+.p1-cards {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    height: 157px;
+    width: 113px;
+    transform: rotateX(0deg);
+}
+
+.p2-cards {
+    position: absolute;
+    top: 10px;
+    left: calc(50% - 113px/2);
+    height: 157px;
+    width: 113px;
+    transform: rotateX(0deg);
+}
+
+.p3-cards {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    height: 157px;
+    width: 113px;
+    transform: rotateX(0deg);
+}
+
+.whole-card {
+    rotate: 0deg;
+    transition: 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.whole-card .card-front {
+    transform: rotateX(180deg);
+    z-index: 1;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+}
+
+.whole-card .card-back {
+    transform: rotateX(0deg);
+    z-index: 2;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+}
+
+.p1-cards img, .p2-cards img, .p3-cards img {
+    height: 157px;
+    width: 113px;
+    transition: 0.3s ease;
+}
+
+.my-cards.in-center {
+    height: 235.5px;
+    width: 169.5px;
+    bottom: calc(50% - 235.5px/2);
+    left: calc(50% - 169.5px/2);
+    transform: rotateX(180deg);
+}
+
+.p1-cards.in-center {
+    height: 235.5px;
+    width: 169.5px;
+    top: calc(50% - 235.5px/2);
+    left: calc(50% - 169.5px/2);
+    transform: rotateX(-180deg);
+}
+
+.p2-cards.in-center {
+    height: 235.5px;
+    width: 169.5px;
+    top: calc(50% - 235.5px/2);
+    left: calc(50% - 169.5px/2);
+    transform: rotateX(-180deg);
+}
+
+.p3-cards.in-center {
+    height: 235.5px;
+    width: 169.5px;
+    top: calc(50% - 235.5px/2);
+    right: calc(50% - 169.5px/2);
+    transform: rotateX(-180deg);
+}
+
+.in-center img {
+    height: 235.5px;
+    width: 169.5px;
+}
+
+.in-center img.card-front {
+    transform: translateY(-235.5px) rotateX(180deg);
+}
+
+#callSnap {
+    position: absolute;
+    bottom: 10px;
+    width: 80%;
+    height: 80px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#callSnap::after {
+    content: '[ spacebar ]';
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.whole-card.in-center {
+    rotate: 5deg;
+}
+
+.whole-card.in-center:nth-child(2n) {
+    rotate: -4deg;
+}
+
+.whole-card.in-center:nth-child(3n) {
+    rotate: 2deg;
+}
+
+.whole-card.in-center:nth-child(4n) {
+    rotate: -5deg;
+}
+
+.whole-card.in-center:nth-child(5n) {
+    rotate: -6deg;
+}
+
+.whole-card.in-center:nth-child(6n) {
+    rotate: 6deg;
+}
+
+.whole-card.in-center:nth-child(7n) {
+    rotate: -3deg;
+}
+
+.whole-card.in-center:nth-child(8n) {
+    rotate: -7deg;
+}
+
+.whole-card.in-center:nth-child(9n) {
+    rotate: 3deg;
+}
+
+.whole-card.in-center:nth-child(10n) {
+    rotate: -5deg;
+}
+
+.whole-card.in-center:nth-child(11n) {
+    rotate: 7deg;
+}
+
+/* @media for mobile */
+@media screen and (max-width: 600px) {
+    .my-cards {
+        height: 157px;
+        width: 113px;
+        left: calc(50% - 113px/2);
+    }
+
+    .my-cards img {
+        height: 157px;
+        width: 113px;
+    }
+
+    .in-center img {
+        height: 157px;
+        width: 113px;
+    }
+
+    .in-center img.card-front {
+        transform: translateY(-157px) rotateX(180deg);
+    }
+
+    .my-cards.in-center {
+        height: 157px;
+        width: 113px;
+        bottom: calc(50% - 157px/2);
+        left: calc(50% - 113px/2);
+        transform: rotateX(180deg);
+    }
+    
+    .p1-cards.in-center {
+        height: 157px;
+        width: 113px;
+        top: calc(50% - 157px/2);
+        left: calc(50% - 113px/2);
+        transform: rotateX(-180deg);
+    }
+    
+    .p2-cards.in-center {
+        height: 157px;
+        width: 113px;
+        top: calc(50% - 157px/2);
+        left: calc(50% - 113px/2);
+        transform: rotateX(-180deg);
+    }
+    
+    .p3-cards.in-center {
+        height: 157px;
+        width: 113px;
+        top: calc(50% - 157px/2);
+        right: calc(50% - 113px/2);
+        transform: rotateX(-180deg);
+    }
+}

@@ -1,3 +1,5 @@
+let zIndexCount = 10;
+
 let urlParams = new URLSearchParams(window.location.search);
 
 if (urlParams.get('join') != null) {
@@ -8,6 +10,8 @@ if (urlParams.get('join') != null) {
 } else if (urlParams.get('create') != null) {
     document.getElementById("create").classList.add("hidden");
     document.getElementById("join").classList.add("hidden");
+
+    createGame();
 
     addCreateElements();
 }
@@ -30,7 +34,7 @@ document.getElementById("join").addEventListener("click", () => {
 
 function addCreateElements() {
     let code = document.createElement("p");
-    code.innerText = "DG425";
+    code.innerText = "_ _ _ _ _";
     code.classList.add("code");
 
     document.getElementsByClassName("buttons")[0].appendChild(code);
@@ -38,15 +42,14 @@ function addCreateElements() {
     let box = document.getElementsByClassName("box")[0];
     let ul = document.createElement("ul");
     ul.id = "playerList";
+    let headerLI = document.createElement("li");
+    headerLI.innerText = "Players";
+    
     let li = document.createElement("li");
-    li.innerText = "Player 1";
-    let li2 = document.createElement("li");
-    li2.innerText = "Player 2";
-    let li3 = document.createElement("li");
-    li3.innerText = "Player 2";
+    li.innerText = "You";
+
+    ul.appendChild(headerLI);
     ul.appendChild(li);
-    ul.appendChild(li2);
-    ul.appendChild(li3);
     box.appendChild(ul);
 
     let startBtn = document.createElement("button");
@@ -57,6 +60,29 @@ function addCreateElements() {
     startBtn.addEventListener("click", () => {
         startGame();
     });
+
+    // reomve this
+    setTimeout(() => {
+        code.innerText = "GD8G8";
+    },1000);
+
+    setTimeout(() => {
+        li = document.createElement("li");
+        li.innerText = "Player 2";
+        ul.appendChild(li);
+    },2000);
+
+    setTimeout(() => {
+        li = document.createElement("li");
+        li.innerText = "Player 3";
+        ul.appendChild(li);
+    },3000);
+
+    setTimeout(() => {
+        li = document.createElement("li");
+        li.innerText = "Player 4";
+        ul.appendChild(li);
+    },4000);
 }
 
 function addJoinElements() {
@@ -110,7 +136,7 @@ function addJoinElements() {
     document.getElementsByClassName('box')[0].appendChild(joinButton);
 
     joinButton.addEventListener('click', () => {
-
+        joinGame();
     });
 
     const inputElements = [...document.querySelectorAll('#digit-group input')]
@@ -145,13 +171,120 @@ function addJoinElements() {
     })
 }
 
-function startGame(){
+function createGame(){
+
+}
+
+function joinGame(){
+
+}
+
+function startGame() {
     clearPage();
+
+    createGameButtons();
+
+
+    // replace this with what is received from socket
+    setTimeout(() => {
+        for (let i = 0; i < 52; i++) {
+            let article;
+            let cardback;
+            let cardfront;
+            if (i % 4 == 0) {
+                article = document.createElement("article");
+                article.classList.add("my-cards");
+                article.classList.add("whole-card");
+
+                cardback = document.createElement("img");
+                cardback.src = "/images/cards/back.png";
+                cardback.classList.add("card-back");
+
+                cardfront = document.createElement("img");
+                cardfront.src = "/images/cards/0D.png";
+                cardfront.classList.add("card-front");
+
+                article.appendChild(cardback);
+                article.appendChild(cardfront);
+
+                document.body.appendChild(article);
+            } else if (i % 4 == 1) {
+                article = document.createElement("article");
+                article.classList.add("p1-cards");
+                article.classList.add("whole-card");
+
+                cardback = document.createElement("img");
+                cardback.src = "/images/cards/back.png";
+                cardback.classList.add("card-back");
+
+                cardfront = document.createElement("img");
+                cardfront.src = "/images/cards/2C.png";
+                cardfront.classList.add("card-front");
+
+                article.appendChild(cardback);
+                article.appendChild(cardfront);
+
+                document.body.appendChild(article);
+            } else if (i % 4 == 2) {
+                article = document.createElement("article");
+                article.classList.add("p2-cards");
+                article.classList.add("whole-card");
+
+                cardback = document.createElement("img");
+                cardback.src = "/images/cards/back.png";
+                cardback.classList.add("card-back");
+
+                cardfront = document.createElement("img");
+                cardfront.src = "/images/cards/3H.png";
+                cardfront.classList.add("card-front");
+
+                article.appendChild(cardback);
+                article.appendChild(cardfront);
+
+                document.body.appendChild(article);
+            } else {
+                article = document.createElement("article");
+                article.classList.add("p3-cards");
+                article.classList.add("whole-card");
+
+                cardback = document.createElement("img");
+                cardback.src = "/images/cards/back.png";
+                cardback.classList.add("card-back");
+
+                cardfront = document.createElement("img");
+                cardfront.src = "/images/cards/4S.png";
+                cardfront.classList.add("card-front");
+
+                article.appendChild(cardback);
+                article.appendChild(cardfront);
+
+                document.body.appendChild(article);
+            }
+
+            article.addEventListener("click", () => {
+                article.classList.add("in-center");
+                article.style.zIndex = zIndexCount++;
+            });
+        }
+
+        window.addEventListener("keydown", (e) => {
+            // if key is spacebar
+            if (e.keyCode == 32) {
+                e.preventDefault();
+
+                callSnap();
+            }
+        });
+
+        document.getElementById("callSnap").addEventListener("click", () => {
+            callSnap();
+        });
+    }, 1000);
 
 
 }
 
-function clearPage(){
+function clearPage() {
     document.getElementsByClassName("box")[0].style.transform = "translateY(100px)";
     document.getElementsByTagName("footer")[0].style.transform = "translateY(100px)";
     document.getElementsByTagName("header")[0].style.transform = "translateY(100px)";
@@ -165,4 +298,19 @@ function clearPage(){
         document.getElementsByTagName("footer")[0].remove();
         document.getElementsByTagName("header")[0].remove();
     }, 1000);
+
+    window.scrollTo(0, 0);
+}
+
+function createGameButtons(){
+    let snapBtn = document.createElement("button");
+    snapBtn.textContent = "Snap!";
+    snapBtn.id = "callSnap";
+
+    document.body.appendChild(snapBtn);
+}
+
+function callSnap(){
+    let time = new Date();
+    console.log("Called snap : " + time.getTime());
 }

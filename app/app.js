@@ -11,6 +11,10 @@ app.get('/login', function (req, res) {
     res.sendFile(__dirname + '/pages/login.html');
 })
 
+app.get('/signup', function (req, res) {
+    res.sendFile(__dirname + '/pages/signup.html');
+})
+
 app.get('/home', function (req, res) {
     res.sendFile(__dirname + '/pages/home.html');
 })
