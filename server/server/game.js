@@ -285,7 +285,7 @@ function setNextPlayerTurn(lobby, currentPlayer) {
         lobby.get(playersWS[playerIndex]).turn = true;
         lobby.forEach( (value, key) => {
             key.send(JSON.stringify({
-                type: (currentPlayer === key)?"yourTurn":"playerTurn",
+                type: (playersWS[playerIndex] === key)?"yourTurn":"playerTurn",
                 player: lobby.get(playersWS[playerIndex]).id,
             }))
         });
