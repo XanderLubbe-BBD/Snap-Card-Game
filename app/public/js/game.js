@@ -2,6 +2,7 @@ let zIndexCount = 10;
 let jCode = "";
 let myTurn = false;
 let myId = "";
+let waitingToJoin = false;
 
 const debug = true;
 
@@ -189,7 +190,7 @@ function joinGame() {
     }
     sendMessage(msg);
 
-    showWaiting();
+    waitingToJoin = true;
 }
 
 function startGame(players) {
@@ -201,7 +202,8 @@ function startGame(players) {
     setTimeout(() => {
         let myCards = -1;
         let myIndex = -1;
-        for (let i = 0; i < players.length; i++) {
+        let totalPlayers = players.length;
+        for (let i = 0; i < totalPlayers; i++) {
             let id = players[i].id;
 
             if (id = myId) {
@@ -209,6 +211,14 @@ function startGame(players) {
                 myIndex = i;
                 break;
             }
+        }
+
+        if(totalPlayers == 2){
+            totalPlayers = "two";
+        } else if(totalPlayers == 3){
+            totalPlayers = "three";
+        } else {
+            totalPlayers = "four";
         }
 
         players = players.filter(player => {
@@ -220,7 +230,8 @@ function startGame(players) {
             article = document.createElement("article");
             article.classList.add("my-cards");
             article.classList.add("whole-card");
-            article.setAttribute("id", `${myId}`);
+            article.classList.add(totalPlayers);
+            article.setAttribute("data-id", `${myId}`);
 
             cardback = document.createElement("img");
             cardback.src = "/images/cards/back.png";
@@ -259,7 +270,8 @@ function startGame(players) {
                 article = document.createElement("article");
                 article.classList.add(`p${i+1}-cards`);
                 article.classList.add("whole-card");
-                article.setAttribute("id", `${players[i].id}`);
+                article.classList.add(totalPlayers);
+                article.setAttribute("data-id", `${players[i].id}`);
 
                 cardback = document.createElement("img");
                 cardback.src = "/images/cards/back.png";
@@ -300,7 +312,8 @@ function startGame(players) {
 
             debugBtn.addEventListener("click", () => {
                let msg = {
-                   type: "debug"
+                   type: "debug",
+                   joinCode: jCode
                };
                sendMessage(msg);
             });

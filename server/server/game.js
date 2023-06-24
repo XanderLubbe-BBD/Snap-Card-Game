@@ -303,3 +303,24 @@ function validatePlayerByWebSocket(joinCode, wss) {
 
     return false
 }
+
+// debug
+export async function debug(joinCode, playerWS){
+    if (validatePlayerByWebSocket(joinCode, playerWS)) {
+        const game = activeGames.get(joinCode);
+
+        let players = [];
+
+        game.lobby.forEach((value, key) => {
+            players.push({
+                id: value.id,
+                cards: value.currentHand.length
+            });
+        })
+
+        playerWS.send(JSON.stringify({
+            type: "debug",
+            players: players
+        }))
+    }
+}

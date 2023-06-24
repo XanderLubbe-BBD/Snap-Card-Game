@@ -14,12 +14,17 @@ ws.addEventListener('message', function (event) {
             document.getElementById("join-code").textContent = jCode;
             break;
         case "join":
-            try {
-                let li = document.createElement("li");
-                li.innerText = msg.player;
-                document.getElementById("playerList").appendChild(li);
-            } catch (e) {
-                
+            if(waitingToJoin){
+                showWaiting();
+                waitingToJoin = false;
+            } else {
+                try {
+                    let li = document.createElement("li");
+                    li.innerText = msg.player;
+                    document.getElementById("playerList").appendChild(li);
+                } catch (e) {
+                    
+                }
             }
             
             break;
@@ -34,19 +39,20 @@ ws.addEventListener('message', function (event) {
             break;
         case "placed":
             let card = msg.card;
-            let player = msg.id;
+            let player = msg.player;
 
             let elements = document.getElementsByClassName("whole-card");
-            elements = elements.filter(element => {
-                return element.getAttribute("id") === player;
+            
+            elements = [...elements].filter(element => {
+                return element.getAttribute("data-id") === player;
             });
 
-            let nextCard = elements[elements.length];
+            let nextCard = elements[elements.length-1];
 
-            nextCard.getElementsByClassName("card-front").src = `/images/cards/${card.code}.png`;
+            nextCard.getElementsByClassName("card-front")[0].src = `/images/cards/${card.code}.png`;
             nextCard.classList.add("in-center");
-            nextCard.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards");
-            nextCard.removeAttribute("id");
+            nextCard.style.zIndex = zIndexCount++;
+            nextCard.removeAttribute("data-id");
 
             break;
         case "gameOver":
@@ -63,6 +69,7 @@ ws.addEventListener('message', function (event) {
             let myNewCards = document.getElementsByClassName("in-center");
 
             for (let i = 0; i < cards.length; i++) {
+                myNewCards.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards");
                 myNewCards[i].classList.add("my-cards");
                 myNewCards[i].setAttribute("id", `${myId}`);
                 myNewCards[i].classList.remove("in-center");
@@ -74,6 +81,7 @@ ws.addEventListener('message', function (event) {
             let playerNewCards = document.getElementsByClassName("in-center");
             let winningPlayer = msg.player;
             for (let i = 0; i < cards.length; i++) {
+                playerNewCards.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards");
                 playerNewCards[i].classList.add(`p${getPlayerIndex(winningPlayer)}-cards`);
                 playerNewCards[i].setAttribute("id", `${winningPlayer}`);
                 playerNewCards[i].classList.remove("in-center");
@@ -83,6 +91,18 @@ ws.addEventListener('message', function (event) {
             break;
         case "leave":
             let playerId = msg.player;
+
+            let leaveElems = document.getElementsByClassName("whole-card");
+
+            leaveElems = [...leaveElems].filter(element => {
+                return element.getAttribute("data-id") === playerId;
+            });
+
+            for(let i = 0; i < leaveElems.length; i++){
+                leaveElems[i].classList.add("in-center");
+                leaveElems[i].removeAttribute("data-id");
+            }
+            
 
             break;
         case "debug":
@@ -102,16 +122,16 @@ function checkCardSync(players){
     
     let checkArr = [];
 
-    for(let i = 0; i > players.length; i++){
+    for(let i = 0; i < players.length; i++){
         let playerId = players[i].id;
         let playerCards = players[i].cards;
 
         let elements = document.getElementsByClassName("whole-card");
-        elements = elements.filter(element => {
-            return element.getAttribute("id") === playerId;
+        elements = [...elements].filter(element => {
+            return element.getAttribute("data-id") === playerId;
         });
 
-        console.log(`[INFO] player ${playerId} has ${playerCards} cards (actual: ${elements.length})`);
+        console.log(`[INFO] Player "${playerId}" has ${playerCards} cards (actual: ${elements.length})`);
 
         checkArr.push(playerCards == elements.length);
     }

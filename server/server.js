@@ -58,6 +58,9 @@ wss.on('connection', function connection(ws) {
                     );
                 });
                 break;
+            case "debug":
+                GameLogic.debug(data.joinCode, ws);
+                break;
         }
     });
 });
