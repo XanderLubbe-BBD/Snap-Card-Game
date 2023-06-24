@@ -1,13 +1,12 @@
-import {deck_config} from '../config/deck_config'
-
 /**
  * Desc:
  * Creates a deck for the game.
  */
 export async function getDeck(){
+    const count = 1;
 
     const params = new URLSearchParams();
-    params.append('deck_count', deck_config.deck_count);
+    params.append('deck_count', count);
 
     const response = await fetch(`https://deckofcardsapi.com/api/deck/new/shuffle/?${params}`)
       
@@ -95,6 +94,6 @@ export async function drawDeck(deck_id, count){
     params.append('count', count);
 
     const response = await fetch(`https://deckofcardsapi.com/api/deck/${deck_id}/draw/?${params}`)
-      
+    console.log(response.json());
     return response.json()
 }

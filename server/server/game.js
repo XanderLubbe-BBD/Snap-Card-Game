@@ -1,4 +1,4 @@
-import { getDeck, drawDeck, addPile, drawPile, listPile } from '../api/docApi';
+import * as deckAPI from '../api/docApi.js';
 
 /**
  * 
@@ -32,7 +32,7 @@ export async function createGame(playerInfo, playerWS){
     let lobby = new Map();
     lobby.set(playerWS, new Player(playerInfo))
 
-    const gameDeck = await getDeck();
+    const gameDeck = await deckAPI.getDeck();
 
     const gameId = 1
     const game = {
@@ -107,7 +107,7 @@ export async function leaveGame(joinCode, playerWS){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
         if (game.started === true) {
-            addCard(game.deck_id, game.lobby.get(playerWS).currentHand);
+            const result = await deckAPI.addCard(game.deck_id, game.lobby.get(playerWS).currentHand);
             setNextPlayerTurn(game.lobby, playerWS);
         }
         activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerWS);
@@ -132,23 +132,31 @@ export async function startGame(joinCode, playerWS){
         if (game.started === false) {
             const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
             const numCard = 52 / game.lobby.size;
-
             activeGames.get(joinCode).lobby.forEach(async player  => {
-                let currentHand = await drawDeck(game.deck_id, numCard);
+                let currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
                 player.turn = false;
                 player.currentHand = currentHand.cards;
                 player.currentCard = currentHand.cards[0];
             });
+            console.log(activeGames.get(joinCode).lobby);
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
             activeGames.get(joinCode).started = true;
             console.log(randomPlayer);
 
-            game.lobby.forEach( (value, key) => {
-                key.send(JSON.stringify({
-                    type: (playerWS === key)?"yourTurn":"playerTurn",
-                    player: game.lobby.get(randomPlayer).id
-                }))
+            activeGames.get(joinCode).lobby.forEach( (value, key) => {
+                if (playerWS === key) {
+                    key.send(JSON.stringify({
+                        type: "yourTurn",
+                        player: value.id
+                    }))
+                } else {
+                    key.send(JSON.stringify({
+                        type: "playerTurn",
+                        player: activeGames.get(joinCode).lobby.get(randomPlayer).id
+                    }))
+                }
+                
             });
         }
     }
@@ -169,7 +177,7 @@ export async function playCard(joinCode, playerWS, card){
         
         if (game.started === true) {
             if (game.lobby.get(playerWS).currentCard === card) {
-                addPile(game.deck_id, card.code);
+                const result = await deckAPI.addPile(game.deck_id, card.code);
                 game.lobby.get(playerWS).currentHand.unshift()
                 game.lobby.get(playerWS).currentCard = game.lobby.get(playerWS).currentHand
             }
@@ -208,7 +216,7 @@ export async function snap(joinCode, playerWS){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
         if (game.started === true) {
-            const pile = await listPile(game.deck_id);
+            const pile = await deckAPI.listPile(game.deck_id);
             const firstCard = pile[pile.length - 1];
             const secondCard = pile[pile.length - 2];
             if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
@@ -220,7 +228,7 @@ export async function snap(joinCode, playerWS){
                         }))
                     });
                 } else {
-                    const snapPot = await drawPile(game.deck_id, pile.length);
+                    const snapPot = await deckAPI.drawPile(game.deck_id, pile.length);
                     game.lobby.forEach( (value, key) => {
                         if (key === playerWS) {
                             key.send(JSON.stringify({
