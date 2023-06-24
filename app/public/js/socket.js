@@ -131,7 +131,7 @@ function checkCardSync(players){
             return element.getAttribute("data-id") === playerId;
         });
 
-        console.log(`[INFO] Player "${playerId}" has ${playerCards} cards (actual: ${elements.length})`);
+        console.log(`[INFO] Player "${playerId}" has ${playerCards} cards on the server (Front-end: ${elements.length})`);
 
         checkArr.push(playerCards == elements.length);
     }

@@ -253,6 +253,8 @@ function startGame(players) {
                         joinCode: jCode
                     }
                     sendMessage(msg);
+
+                    myTurn = false;
                 }
             });
         }
