@@ -75,7 +75,6 @@ export async function drawPile(deck_id, count){
 export async function listPile(deck_id){
 
     const params = new URLSearchParams();
-    params.append('count', count);
     const response = await fetch(`https://deckofcardsapi.com/api/deck/${deck_id}/pile/SnapPot/list/`)
       
     return response.json()

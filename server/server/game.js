@@ -190,7 +190,7 @@ export async function playCard(joinCode, playerWS){
 
             const result = await deckAPI.addPile(game.deck_id, [card.code]);
 
-            activeGames.get(joinCode).lobby.get(playerWS).currentHand.unshift();
+            activeGames.get(joinCode).lobby.get(playerWS).currentHand.shift();
             game.lobby.forEach( (value, key) => {
                 key.send(JSON.stringify({
                     type: "placed",
