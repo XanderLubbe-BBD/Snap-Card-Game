@@ -80,7 +80,7 @@ ws.addEventListener('message', function (event) {
         case "potWon":
             let playerNewCards = document.getElementsByClassName("in-center");
             let winningPlayer = msg.player;
-            for (let i = 0; i < cards.length; i++) {
+            for (let i = 0; i < playerNewCards.length; i++) {
                 playerNewCards.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards");
                 playerNewCards[i].classList.add(`p${getPlayerIndex(winningPlayer)}-cards`);
                 playerNewCards[i].setAttribute("id", `${winningPlayer}`);
