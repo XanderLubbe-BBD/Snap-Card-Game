@@ -1,5 +1,7 @@
 let zIndexCount = 10;
 let jCode = "";
+let myTurn = false;
+let myId = "";
 
 let urlParams = new URLSearchParams(window.location.search);
 
@@ -22,6 +24,8 @@ document.getElementById("create").addEventListener("click", () => {
     document.getElementById("create").classList.add("hidden");
     document.getElementById("join").classList.add("hidden");
 
+    createGame();
+
     addCreateElements();
 });
 
@@ -37,6 +41,7 @@ function addCreateElements() {
     let code = document.createElement("p");
     code.innerText = "_ _ _ _ _";
     code.classList.add("code");
+    code.id = "join-code";
 
     document.getElementsByClassName("buttons")[0].appendChild(code);
 
@@ -45,7 +50,7 @@ function addCreateElements() {
     ul.id = "playerList";
     let headerLI = document.createElement("li");
     headerLI.innerText = "Players";
-    
+
     let li = document.createElement("li");
     li.innerText = "You";
 
@@ -59,31 +64,12 @@ function addCreateElements() {
     box.appendChild(startBtn);
 
     startBtn.addEventListener("click", () => {
-        startGame();
+        let msg = {
+            type: "start",
+            joinCode: jCode
+        }
+        sendMessage(msg);
     });
-
-    // reomve this
-    setTimeout(() => {
-        code.innerText = "GD8G8";
-    },1000);
-
-    setTimeout(() => {
-        li = document.createElement("li");
-        li.innerText = "Player 2";
-        ul.appendChild(li);
-    },2000);
-
-    setTimeout(() => {
-        li = document.createElement("li");
-        li.innerText = "Player 3";
-        ul.appendChild(li);
-    },3000);
-
-    setTimeout(() => {
-        li = document.createElement("li");
-        li.innerText = "Player 4";
-        ul.appendChild(li);
-    },4000);
 }
 
 function addJoinElements() {
@@ -172,42 +158,57 @@ function addJoinElements() {
     })
 }
 
-function createGame(){
+function createGame() {
     let msg = {
         type: "create",
-        player: "player"
+        id: "player"
     }
+    console.log("Sending:");
+    console.log(msg);
     sendMessage(msg);
 }
 
-function joinGame(){
+function joinGame() {
     jCode = "";
 
     let digits = document.getElementsByClassName("singleInput");
-    for(let i = 0; i < digits.length; i++){
-        joinCode += digits[i].value;
+    for (let i = 0; i < digits.length; i++) {
+        jCode += digits[i].value.toUpperCase();
     }
 
     let msg = {
         type: "join",
-        joinCode: jCode
+        joinCode: jCode,
+        id: "player2"
     }
     sendMessage(msg);
+
+    showWaiting();
 }
 
-function startGame() {
+function startGame(players) {
     clearPage();
 
     createGameButtons();
 
-    let msg = {
-        type: "start",
-        joinCode: jCode
-    }
-    sendMessage(msg);
-
     // replace this with what is received from socket
     setTimeout(() => {
+        // let myCards = -1;
+        // let myIndex = -1;
+        // for(let i = 0; i < players.length; i++){
+        //     let id = players[i].id;
+
+        //     if(id = myId){
+        //         myCards = players[i].cards;
+        //         myIndex = i;
+        //         break;
+        //     }
+        // }
+
+        // players = players.filter(player => {
+        //     return player.id != myId;
+        // });
+
         for (let i = 0; i < 52; i++) {
             let article;
             let cardback;
@@ -229,6 +230,19 @@ function startGame() {
                 article.appendChild(cardfront);
 
                 document.body.appendChild(article);
+
+                article.addEventListener("click", () => {
+                    if(myTurn){
+                        article.classList.add("in-center");
+                        article.style.zIndex = zIndexCount++;
+    
+                        let msg = {
+                            type: "place",
+                            joinCode: jCode
+                        }
+                        sendMessage(msg);
+                    }
+                });
             } else if (i % 4 == 1) {
                 article = document.createElement("article");
                 article.classList.add("p1-cards");
@@ -281,11 +295,6 @@ function startGame() {
 
                 document.body.appendChild(article);
             }
-
-            article.addEventListener("click", () => {
-                article.classList.add("in-center");
-                article.style.zIndex = zIndexCount++;
-            });
         }
 
         window.addEventListener("keydown", (e) => {
@@ -323,7 +332,7 @@ function clearPage() {
     window.scrollTo(0, 0);
 }
 
-function createGameButtons(){
+function createGameButtons() {
     let snapBtn = document.createElement("button");
     snapBtn.textContent = "Snap!";
     snapBtn.id = "callSnap";
@@ -331,7 +340,18 @@ function createGameButtons(){
     document.body.appendChild(snapBtn);
 }
 
-function callSnap(){
+function callSnap() {
     let time = new Date();
     console.log("Called snap : " + time.getTime());
+
+    let msg = {
+        type: "snap",
+        joinCode: jCode
+    }
+    sendMessage(msg);
+}
+
+function showWaiting() {
+    document.getElementById("join-code").innerHTML = "Waiting for game to start...";
+    document.getElementById("join-btn").remove();
 }

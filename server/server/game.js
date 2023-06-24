@@ -71,7 +71,7 @@ export async function joinGame(joinCode, playerInfo, playerWS){
                 activeGames.get(joinCode).lobby.forEach((value, key) => {
                     key.send(JSON.stringify({
                         type: "join",
-                        player: playerInfo.id
+                        player: playerInfo
                     }))
                 });  
             } else {
@@ -143,6 +143,8 @@ export async function startGame(joinCode, playerWS){
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
             activeGames.get(joinCode).started = true;
+
+            // TODO: Send start message to all players before saying whose turn it is
 
             activeGames.get(joinCode).lobby.forEach( (value, key) => {
                 if (playerWS === key) {
