@@ -196,12 +196,13 @@ export async function playCard(joinCode, playerWS){
         
         if (game.started === true) {
             const card = game.lobby.get(playerWS).currentHand[0];
-            const result = await deckAPI.addPile(game.deck_id, card.code);
+
+            const result = await deckAPI.addPile(game.deck_id, [card.code]);
             game.lobby.get(playerWS).currentHand.unshift()
             
-            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWs);
+            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
 
-            const currentPlayer = null;
+            let currentPlayer = null;
             activeGames.get(joinCode).lobby.forEach((value) => {
                 if (value.turn == true) {
                     currentPlayer = value;
@@ -292,9 +293,9 @@ function removePlayerByWebSocket(lobby, wss) {
 }
 
 function setNextPlayerTurn(lobby, currentPlayer) {
-    if (lobby.has(wss)) {
+    if (lobby.has(currentPlayer)) {
         const playersWS = Array.from(lobby.keys());
-        const playerIndex = (playersWS.findIndex(playerws => playerws == currentPlayer) + 1) % lobby.length
+        const playerIndex = (playersWS.findIndex(playerws => playerws === currentPlayer) + 1) % lobby.size
 
         lobby.forEach(player => player.turn = false);
         lobby.get(playersWS[playerIndex]).turn = true;
