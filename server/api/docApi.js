@@ -94,6 +94,6 @@ export async function drawDeck(deck_id, count){
     params.append('count', count);
 
     const response = await fetch(`https://deckofcardsapi.com/api/deck/${deck_id}/draw/?${params}`)
-    
+
     return response.json()
 }
