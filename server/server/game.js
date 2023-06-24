@@ -11,6 +11,7 @@ function Player(id) {
     // this.name = name;
     this.currentHand = null;
     this.turn = false;
+    this.timesPlayed = 0;
 }
   
 const activeGames = new Map();
@@ -190,6 +191,7 @@ export async function playCard(joinCode, playerWS){
 
             const result = await deckAPI.addPile(game.deck_id, [card.code]);
 
+            activeGames.get(joinCode).lobby.get(playerWS).timesPlayed += 1;
             activeGames.get(joinCode).lobby.get(playerWS).currentHand.shift();
             game.lobby.forEach( (value, key) => {
                 key.send(JSON.stringify({
@@ -235,13 +237,14 @@ export async function snap(joinCode, playerWS){
                             console.log("JackPot!");
                             deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
                                 console.log(snapPot);
-                                activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot);
+                                const result = activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot);
+                                activeGames.get(joinCode).lobby.get(playerWS).currentHand = result;
 
                                 game.lobby.forEach( (value, key) => {
                                     if (key === playerWS) {
                                         key.send(JSON.stringify({
                                             type: "youWinPot",
-                                            cards: activeGames.get(joinCode).lobby.get(playerWS).currentHand,
+                                            cards: result,
                                         }))
                                     } else {
                                         key.send(JSON.stringify({
