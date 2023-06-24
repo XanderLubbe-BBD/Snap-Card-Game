@@ -1,4 +1,5 @@
 let zIndexCount = 10;
+let jCode = "";
 
 let urlParams = new URLSearchParams(window.location.search);
 
@@ -172,11 +173,26 @@ function addJoinElements() {
 }
 
 function createGame(){
-
+    let msg = {
+        type: "create",
+        player: "player"
+    }
+    sendMessage(msg);
 }
 
 function joinGame(){
+    jCode = "";
 
+    let digits = document.getElementsByClassName("singleInput");
+    for(let i = 0; i < digits.length; i++){
+        joinCode += digits[i].value;
+    }
+
+    let msg = {
+        type: "join",
+        joinCode: jCode
+    }
+    sendMessage(msg);
 }
 
 function startGame() {
@@ -184,6 +200,11 @@ function startGame() {
 
     createGameButtons();
 
+    let msg = {
+        type: "start",
+        joinCode: jCode
+    }
+    sendMessage(msg);
 
     // replace this with what is received from socket
     setTimeout(() => {
