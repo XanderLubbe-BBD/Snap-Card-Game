@@ -6,9 +6,9 @@ import * as deckAPI from '../api/docApi.js';
  * Desc:
  * Instantiates a player using a destructor
  */
-function Player({id, name}) {
+function Player(id) {
     this.id = id;
-    this.name = name;
+    // this.name = name;
     this.currentHand = null;
     this.turn = false;
 }
@@ -29,27 +29,29 @@ export async function createGame(playerInfo, playerWS){
     let lobby = new Map();
     lobby.set(playerWS, new Player(playerInfo))
 
-    const gameDeck = await deckAPI.getDeck();
-
-    const game = {
-        lobby: lobby,
-        deck_id: gameDeck.deck_id,
-        started: false,
-        snapCalled: false,
-        pile: null,
-    };
-
-    activeGames.set(joinCode, game);
-    console.log({
-        type: "response",
-        joinCode: joinCode,
-        message: `Created game successfully`
+    deckAPI.getDeck().then( (gameDeck) => {
+        const game = {
+            lobby: lobby,
+            deck_id: gameDeck.deck_id,
+            started: false,
+            snapCalled: false,
+            pile: null,
+        };
+    
+        activeGames.set(joinCode, game);
+        console.log({
+            type: "response",
+            joinCode: joinCode,
+            message: `Created game successfully`
+        });
+    
+        playerWS.send(JSON.stringify({
+            type: "create",
+            joinCode: joinCode
+        }));
     });
 
-    playerWS.send(JSON.stringify({
-        type: "create",
-        joinCode: joinCode
-    }));
+    
 }
 
 /**
@@ -134,19 +136,34 @@ export async function startGame(joinCode, playerWS){
 
         if (game.started === false) {
             const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
-            const numCard = 52 / game.lobby.size;
-            activeGames.get(joinCode).lobby.forEach(async player  => {
-                const currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
+            const numCard = Math.floor(52 / game.lobby.size);
+
+            for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
+                let currentHand = null;
+                if (game.lobby.size === 3 && playerSocket === randomPlayer) {
+                    currentHand = await deckAPI.drawDeck(game.deck_id, numCard + 1);
+                } else {
+                    currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
+                }
+
                 player.turn = false;
                 player.currentHand = currentHand.cards;
-            });
+            }
+
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
             activeGames.get(joinCode).started = true;
 
-            // TODO: Send start message to all players before saying whose turn it is
+            const lobbyInfo = Array.from(activeGames.get(joinCode).lobby.values()).map( values => {
+                return {"id": values.id, "cards": values.currentHand.length}
+            });
 
             activeGames.get(joinCode).lobby.forEach( (value, key) => {
+                key.send(JSON.stringify({
+                    type: "start",
+                    players: lobbyInfo
+                }))
+
                 if (playerWS === key) {
                     key.send(JSON.stringify({
                         type: "yourTurn",
