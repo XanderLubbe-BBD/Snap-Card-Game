@@ -3,6 +3,7 @@ let jCode = "";
 let myTurn = false;
 let myId = "";
 let waitingToJoin = false;
+let numPlayers = "";
 
 const debug = true;
 
@@ -220,6 +221,8 @@ function startGame(players) {
         } else {
             totalPlayers = "four";
         }
+
+        numPlayers = totalPlayers;
 
         players = players.filter(player => {
             return player.id != myId;

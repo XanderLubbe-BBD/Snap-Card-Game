@@ -68,26 +68,27 @@ ws.addEventListener('message', function (event) {
         case "youWinPot":
             let myNewCards = document.getElementsByClassName("in-center");
 
-            for (let i = 0; i < cards.length; i++) {
-                myNewCards.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards");
-                myNewCards[i].classList.add("my-cards");
-                myNewCards[i].setAttribute("id", `${myId}`);
-                myNewCards[i].classList.remove("in-center");
-                myNewCards[i].style.zIndex = "initial";
-                myNewCards[i].getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
-            }
+            [...myNewCards].map(card => {
+                card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
+                card.classList.add("my-cards");
+                card.setAttribute("data-id", `${myId}`);
+                card.style.zIndex = "initial";
+                card.getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
+            });
+
             break;
         case "potWon":
             let playerNewCards = document.getElementsByClassName("in-center");
             let winningPlayer = msg.player;
-            for (let i = 0; i < playerNewCards.length; i++) {
-                playerNewCards.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards");
-                playerNewCards[i].classList.add(`p${getPlayerIndex(winningPlayer)}-cards`);
-                playerNewCards[i].setAttribute("id", `${winningPlayer}`);
-                playerNewCards[i].classList.remove("in-center");
-                playerNewCards[i].style.zIndex = "initial";
-                playerNewCards[i].getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
-            }
+
+            [...playerNewCards].map(card => {
+                card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
+                card.classList.add(`p${getPlayerIndex(winningPlayer)+1}-cards`);
+                card.setAttribute("data-id", `${winningPlayer}`);
+                card.style.zIndex = "initial";
+                card.getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
+            });
+
             break;
         case "leave":
             let playerId = msg.player;
