@@ -353,14 +353,15 @@ function createGameButtons() {
 }
 
 function callSnap() {
-    let time = new Date();
-    console.log("Called snap : " + time.getTime());
+    let elements = document.getElementsByClassName("in-center");
 
-    let msg = {
-        type: "snap",
-        joinCode: jCode
+    if(elements.length >= 2){
+        let msg = {
+            type: "snap",
+            joinCode: jCode
+        }
+        sendMessage(msg);
     }
-    sendMessage(msg);
 }
 
 function showWaiting() {
