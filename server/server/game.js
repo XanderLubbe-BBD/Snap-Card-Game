@@ -236,11 +236,12 @@ export async function snap(joinCode, playerWS){
                             deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
                                 console.log(snapPot);
                                 activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot);
+
                                 game.lobby.forEach( (value, key) => {
                                     if (key === playerWS) {
                                         key.send(JSON.stringify({
                                             type: "youWinPot",
-                                            cards: snapPot,
+                                            cards: activeGames.get(joinCode).lobby.get(playerWS).currentHand,
                                         }))
                                     } else {
                                         key.send(JSON.stringify({
@@ -282,9 +283,9 @@ function setNextPlayerTurn(lobby, currentPlayer) {
         let count = 1;
         const playersWS = Array.from(lobby.keys());
         let playerIndex = getPlayerIndex(playersWS, currentPlayer, count, lobby.size)
-        // while (lobby.get(playersWS[playerIndex]).currentHand == []) {
-        //     playerIndex = getPlayerIndex(playersWS, currentPlayer, ++count, lobby.size)
-        // }
+        while (lobby.get(playersWS[playerIndex]).currentHand == []) {
+            playerIndex = getPlayerIndex(playersWS, lobby.get(playersWS[playerIndex]), count, lobby.size)
+        }
 
         lobby.forEach((player) => player.turn = false);
         lobby.get(playersWS[playerIndex]).turn = true;
