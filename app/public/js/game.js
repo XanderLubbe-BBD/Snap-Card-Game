@@ -3,6 +3,10 @@ let jCode = "";
 let myTurn = false;
 let myId = "";
 
+const debug = true;
+
+let playerIds = [];
+
 let urlParams = new URLSearchParams(window.location.search);
 
 if (urlParams.get('join') != null) {
@@ -159,9 +163,10 @@ function addJoinElements() {
 }
 
 function createGame() {
+    myId = "player";
     let msg = {
         type: "create",
-        id: "player"
+        id: myId
     }
     console.log("Sending:");
     console.log(msg);
@@ -169,6 +174,7 @@ function createGame() {
 }
 
 function joinGame() {
+    myId = "player2"
     jCode = "";
 
     let digits = document.getElementsByClassName("singleInput");
@@ -179,7 +185,7 @@ function joinGame() {
     let msg = {
         type: "join",
         joinCode: jCode,
-        id: "player2"
+        id: myId
     }
     sendMessage(msg);
 
@@ -193,101 +199,74 @@ function startGame(players) {
 
     // replace this with what is received from socket
     setTimeout(() => {
-        // let myCards = -1;
-        // let myIndex = -1;
-        // for(let i = 0; i < players.length; i++){
-        //     let id = players[i].id;
+        let myCards = -1;
+        let myIndex = -1;
+        for (let i = 0; i < players.length; i++) {
+            let id = players[i].id;
 
-        //     if(id = myId){
-        //         myCards = players[i].cards;
-        //         myIndex = i;
-        //         break;
-        //     }
-        // }
+            if (id = myId) {
+                myCards = players[i].cards;
+                myIndex = i;
+                break;
+            }
+        }
 
-        // players = players.filter(player => {
-        //     return player.id != myId;
-        // });
+        players = players.filter(player => {
+            return player.id != myId;
+        });
 
-        for (let i = 0; i < 52; i++) {
+        // add my cards
+        for (let i = 0; i < myCards; i++) {
+            article = document.createElement("article");
+            article.classList.add("my-cards");
+            article.classList.add("whole-card");
+            article.setAttribute("id", `${myId}`);
+
+            cardback = document.createElement("img");
+            cardback.src = "/images/cards/back.png";
+            cardback.classList.add("card-back");
+
+            cardfront = document.createElement("img");
+            cardfront.src = "/images/cards/blank.png";
+            cardfront.classList.add("card-front");
+
+            article.appendChild(cardback);
+            article.appendChild(cardfront);
+
+            document.body.appendChild(article);
+
+            article.addEventListener("click", () => {
+                if(myTurn){
+                    let msg = {
+                        type: "place",
+                        joinCode: jCode
+                    }
+                    sendMessage(msg);
+                }
+            });
+        }
+
+        // Other players
+        for(let i = 0; i < players.length; i++){
+            playerIds.push(players[i].id);
+            let numCards = players[i].cards;
+
             let article;
             let cardback;
             let cardfront;
-            if (i % 4 == 0) {
+
+            for(let j = 0; j < numCards; j++){
                 article = document.createElement("article");
-                article.classList.add("my-cards");
+                article.classList.add(`p${i+1}-cards`);
                 article.classList.add("whole-card");
+                article.setAttribute("id", `${players[i].id}`);
 
                 cardback = document.createElement("img");
                 cardback.src = "/images/cards/back.png";
                 cardback.classList.add("card-back");
 
                 cardfront = document.createElement("img");
-                cardfront.src = "/images/cards/0D.png";
-                cardfront.classList.add("card-front");
-
-                article.appendChild(cardback);
-                article.appendChild(cardfront);
-
-                document.body.appendChild(article);
-
-                article.addEventListener("click", () => {
-                    if(myTurn){
-                        article.classList.add("in-center");
-                        article.style.zIndex = zIndexCount++;
-    
-                        let msg = {
-                            type: "place",
-                            joinCode: jCode
-                        }
-                        sendMessage(msg);
-                    }
-                });
-            } else if (i % 4 == 1) {
-                article = document.createElement("article");
-                article.classList.add("p1-cards");
-                article.classList.add("whole-card");
-
-                cardback = document.createElement("img");
-                cardback.src = "/images/cards/back.png";
-                cardback.classList.add("card-back");
-
-                cardfront = document.createElement("img");
-                cardfront.src = "/images/cards/2C.png";
-                cardfront.classList.add("card-front");
-
-                article.appendChild(cardback);
-                article.appendChild(cardfront);
-
-                document.body.appendChild(article);
-            } else if (i % 4 == 2) {
-                article = document.createElement("article");
-                article.classList.add("p2-cards");
-                article.classList.add("whole-card");
-
-                cardback = document.createElement("img");
-                cardback.src = "/images/cards/back.png";
-                cardback.classList.add("card-back");
-
-                cardfront = document.createElement("img");
-                cardfront.src = "/images/cards/3H.png";
-                cardfront.classList.add("card-front");
-
-                article.appendChild(cardback);
-                article.appendChild(cardfront);
-
-                document.body.appendChild(article);
-            } else {
-                article = document.createElement("article");
-                article.classList.add("p3-cards");
-                article.classList.add("whole-card");
-
-                cardback = document.createElement("img");
-                cardback.src = "/images/cards/back.png";
-                cardback.classList.add("card-back");
-
-                cardfront = document.createElement("img");
-                cardfront.src = "/images/cards/4S.png";
+                cardfront.src = "/images/cards/blank.png";
                 cardfront.classList.add("card-front");
 
                 article.appendChild(cardback);
@@ -309,6 +288,24 @@ function startGame(players) {
         document.getElementById("callSnap").addEventListener("click", () => {
             callSnap();
         });
+
+        // TODO: remove debug stuff
+        if(debug){
+            let debugBtn = document.createElement("button");
+            debugBtn.textContent = "Request Debug";
+            debugBtn.style.position = "absolute";
+            debugBtn.style.top = "10px";
+            debugBtn.style.left = "10px";
+            document.body.appendChild(debugBtn);
+
+            debugBtn.addEventListener("click", () => {
+               let msg = {
+                   type: "debug"
+               };
+               sendMessage(msg);
+            });
+        }
+        
     }, 1000);
 
 
@@ -354,4 +351,78 @@ function callSnap() {
 function showWaiting() {
     document.getElementById("join-code").innerHTML = "Waiting for game to start...";
     document.getElementById("join-btn").remove();
+}
+
+function getPlayerIndex(id) {
+    for (let i = 0; i < playerIds.length; i++) {
+        if (playerIds[i] == id) {
+            return i;
+        }
+    }
+}
+
+function preLoadCardImages(){
+    preloads = [
+        "/images/cards/back.png",
+        "/images/cards/blank.png",
+        "/images/cards/0H.png",
+        "/images/cards/0D.png",
+        "/images/cards/0C.png",
+        "/images/cards/0S.png",
+        "/images/cards/2H.png",
+        "/images/cards/2D.png",
+        "/images/cards/2C.png",
+        "/images/cards/2S.png",
+        "/images/cards/3H.png",
+        "/images/cards/3D.png",
+        "/images/cards/3C.png",
+        "/images/cards/3S.png",
+        "/images/cards/4H.png",
+        "/images/cards/4D.png",
+        "/images/cards/4C.png",
+        "/images/cards/4S.png",
+        "/images/cards/5H.png",
+        "/images/cards/5D.png",
+        "/images/cards/5C.png",
+        "/images/cards/5S.png",
+        "/images/cards/6H.png",
+        "/images/cards/6D.png",
+        "/images/cards/6C.png",
+        "/images/cards/6S.png",
+        "/images/cards/7H.png",
+        "/images/cards/7D.png",
+        "/images/cards/7C.png",
+        "/images/cards/7S.png",
+        "/images/cards/8H.png",
+        "/images/cards/8D.png",
+        "/images/cards/8C.png",
+        "/images/cards/8S.png",
+        "/images/cards/9H.png",
+        "/images/cards/9D.png",
+        "/images/cards/9C.png",
+        "/images/cards/9S.png",
+        "/images/cards/JH.png",
+        "/images/cards/JD.png",
+        "/images/cards/JC.png",
+        "/images/cards/JS.png",
+        "/images/cards/QH.png",
+        "/images/cards/QD.png",
+        "/images/cards/QC.png",
+        "/images/cards/QS.png",
+        "/images/cards/KH.png",
+        "/images/cards/KD.png",
+        "/images/cards/KC.png",
+        "/images/cards/KS.png",
+        "/images/cards/AH.png",
+        "/images/cards/AD.png",
+        "/images/cards/AC.png",
+        "/images/cards/AS.png",
+    ]
+
+    var tempImg = []
+
+    for(let i = 0; i < preloads.length; i++) {
+        tempImg[i] = new Image();
+        tempImg[i].src = preloads[i];
+    }
 }
