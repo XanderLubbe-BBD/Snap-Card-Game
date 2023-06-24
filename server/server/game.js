@@ -237,7 +237,7 @@ export async function snap(joinCode, playerWS){
                             console.log("JackPot!");
                             deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
                                 console.log(snapPot);
-                                const result = activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot);
+                                const result = activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot.cards);
                                 activeGames.get(joinCode).lobby.get(playerWS).currentHand = result;
 
                                 game.lobby.forEach( (value, key) => {
