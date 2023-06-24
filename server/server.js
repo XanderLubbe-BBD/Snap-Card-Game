@@ -26,6 +26,18 @@ wss.on('connection', function connection(ws) {
         data = JSON.parse(data);
 
         switch (data.type) {
+            case "create":
+                createGame(data.player, ws);
+                break;
+            case "join":
+                joinGame(data.joinCode, data.player, ws);
+                break;            
+            case "leave":
+                leaveGame(data.joinCode, ws);
+                break;   
+            case "start":
+                startGame(data.joinCode, ws);
+                break;   
             case "respond":
                 sendMessage(data.message, ws);
                 break;
