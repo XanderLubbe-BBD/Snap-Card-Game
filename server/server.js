@@ -1,4 +1,5 @@
 import { WebSocketServer } from 'ws';
+import * as GameLogic from './server/game.js'
 
 // TODO: implement secure web sockets (required when accessing fron-end through https)
 
@@ -27,17 +28,23 @@ wss.on('connection', function connection(ws) {
 
         switch (data.type) {
             case "create":
-                createGame(data.player, ws);
+                GameLogic.createGame(data.id, ws);
                 break;
             case "join":
-                joinGame(data.joinCode, data.player, ws);
+                GameLogic.joinGame(data.joinCode, data.id, ws);
                 break;            
             case "leave":
-                leaveGame(data.joinCode, ws);
+                GameLogic.leaveGame(data.joinCode, ws);
                 break;   
             case "start":
-                startGame(data.joinCode, ws);
+                GameLogic.startGame(data.joinCode, ws);
                 break;   
+            case "place":
+                GameLogic.playCard(data.joinCode, ws);
+                break;  
+            case "snap":
+                GameLogic.snap(data.joinCode, ws);
+                break;
             case "respond":
                 sendMessage(data.message, ws);
                 break;

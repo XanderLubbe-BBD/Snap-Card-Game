@@ -6,12 +6,9 @@ import * as deckAPI from '../api/docApi.js';
  * Desc:
  * Instantiates a player using a destructor
  */
-function Player({id, name, isHost, wss}) {
+function Player({id, name}) {
     this.id = id;
     this.name = name;
-    this.isHost = isHost;
-    this.wss = wss;
-    this.currentCard = "";
     this.currentHand = null;
     this.turn = false;
 }
@@ -34,13 +31,11 @@ export async function createGame(playerInfo, playerWS){
 
     const gameDeck = await deckAPI.getDeck();
 
-    const gameId = 1
     const game = {
-        gameId: gameId,
-        joinCode: joinCode,
         lobby: lobby,
         deck_id: gameDeck.deck_id,
         started: false,
+        snapCalled: false,
         pile: null,
     };
 
@@ -52,9 +47,8 @@ export async function createGame(playerInfo, playerWS){
     });
 
     playerWS.send(JSON.stringify({
-        type: "response",
-        joinCode: joinCode,
-        message: `Created game successfully`
+        type: "create",
+        joinCode: joinCode
     }));
 }
 
@@ -73,23 +67,23 @@ export async function joinGame(joinCode, playerInfo, playerWS){
         if (!lobby.has(playerWS)) {
             if (lobby.size < 4) {
                 activeGames.get(joinCode).lobby.set(playerWS, new Player(playerInfo))
-                console.log(activeGames.get(joinCode).lobby.size);
+
                 activeGames.get(joinCode).lobby.forEach((value, key) => {
                     key.send(JSON.stringify({
-                        type: "response",
-                        message: `Player ${playerInfo.id} successfully joined game!`
+                        type: "join",
+                        player: playerInfo.id
                     }))
                 });  
             } else {
                 playerWS.send(JSON.stringify({
-                    type: "response",
-                    message: `Game full!`
+                    type: "error",
+                    message: `Game is full!`
                 }));
             }
             
         } else {
             playerWS.send(JSON.stringify({
-                type: "response",
+                type: "error",
                 message: `Already part of game!`
             }));
         }
@@ -107,8 +101,17 @@ export async function leaveGame(joinCode, playerWS){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
         if (game.started === true) {
+            const leavePlayer = game.lobby.get(playerWS);
             const result = await deckAPI.addCard(game.deck_id, game.lobby.get(playerWS).currentHand);
-            setNextPlayerTurn(game.lobby, playerWS);
+            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
+            activeGames.get(joinCode).lobby.forEach((value, key) => {
+                if (playerWS != key) {
+                    key.send(JSON.stringify({
+                        type: "leave",
+                        player: leavePlayer.id
+                    }))
+                }
+            })
         }
         activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerWS);
         if (activeGames.get(joinCode).lobby.size === 0) {
@@ -133,16 +136,13 @@ export async function startGame(joinCode, playerWS){
             const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
             const numCard = 52 / game.lobby.size;
             activeGames.get(joinCode).lobby.forEach(async player  => {
-                let currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
+                const currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
                 player.turn = false;
                 player.currentHand = currentHand.cards;
-                player.currentCard = currentHand.cards[0];
             });
-            console.log(activeGames.get(joinCode).lobby);
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
             activeGames.get(joinCode).started = true;
-            console.log(randomPlayer);
 
             activeGames.get(joinCode).lobby.forEach( (value, key) => {
                 if (playerWS === key) {
@@ -166,38 +166,38 @@ export async function startGame(joinCode, playerWS){
  * 
  * @param {String} joinCode
  * @param {WebSocket} playerWS
- * @param {Object} card
  * Desc:
  * Allows players to play a card.
  */
-export async function playCard(joinCode, playerWS, card){
+export async function playCard(joinCode, playerWS){
     console.log("Play card");
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
+        activeGames.get(joinCode).snapCalled = false;
         let game = activeGames.get(joinCode);
         
         if (game.started === true) {
-            if (game.lobby.get(playerWS).currentCard === card) {
-                const result = await deckAPI.addPile(game.deck_id, card.code);
-                game.lobby.get(playerWS).currentHand.unshift()
-                game.lobby.get(playerWS).currentCard = game.lobby.get(playerWS).currentHand
-            }
+            const card = game.lobby.get(playerWS).currentHand[0];
+            const result = await deckAPI.addPile(game.deck_id, card.code);
+            game.lobby.get(playerWS).currentHand.unshift()
             
-            game.lobby = setNextPlayerTurn(game.lobby, playerWs);
+            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWs);
 
-            activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
-
-            activeGames.get(joinCode).started = true;
-            console.log(randomPlayer);
-
+            const currentPlayer = null;
+            activeGames.get(joinCode).lobby.forEach((value) => {
+                if (value.turn == true) {
+                    currentPlayer = value;
+                }
+            })
             game.lobby.forEach( (value, key) => {
-                key.send(JSON.stringify({
-                    type: (playerWS === key)?"yourTurn":"playerTurn",
-                    player: game.lobby.get(randomPlayer).id,
-                }))
-
                 key.send(JSON.stringify({
                     type: "placed",
                     card: card,
+                    player: game.lobby.get(playerWS).id,
+                }))
+
+                key.send(JSON.stringify({
+                    type: (playerWS === key)?"yourTurn":"playerTurn",
+                    player: currentPlayer.id,
                 }))
             });
         }
@@ -215,36 +215,42 @@ export async function playCard(joinCode, playerWS, card){
 export async function snap(joinCode, playerWS){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
-        if (game.started === true) {
-            const pile = await deckAPI.listPile(game.deck_id);
-            const firstCard = pile[pile.length - 1];
-            const secondCard = pile[pile.length - 2];
-            if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
-                if (pile.length + game.lobby.get(playerWS) === 52) {
-                    game.lobby.forEach( (value, key) => {
-                        key.send(JSON.stringify({
-                            type: "gameOver",
-                            winner: game.lobby.get(playerWS).id,
-                        }))
-                    });
-                } else {
-                    const snapPot = await deckAPI.drawPile(game.deck_id, pile.length);
-                    game.lobby.forEach( (value, key) => {
-                        if (key === playerWS) {
+        if (game.snapCalled === false) {
+            activeGames.get(joinCode).snapCalled = true;
+            if (game.started === true) {
+                const pile = await deckAPI.listPile(game.deck_id);
+                const firstCard = pile[pile.length - 1];
+                const secondCard = pile[pile.length - 2];
+                if (firstCard.value === secondCard.value) {
+                    if (pile.length + game.lobby.get(playerWS).currentHand.length === 52) {
+                        game.lobby.forEach( (value, key) => {
                             key.send(JSON.stringify({
-                                type: "youWinPot",
-                                cards: snapPot,
+                                type: "gameOver",
+                                winner: game.lobby.get(playerWS).id,
                             }))
-                        } else {
-                            key.send(JSON.stringify({
-                                type: "potWon",
-                                player: game.lobby.get(playerWS).id,
-                            }))
-                        }
-                        
-                    });
+                        });
+                    } else {
+                        const snapPot = await deckAPI.drawPile(game.deck_id, pile.length);
+                        activeGames.get(joinCode).lobby.get(playerWS).currentHand = snapPot;
+
+                        game.lobby.forEach( (value, key) => {
+                            if (key === playerWS) {
+                                key.send(JSON.stringify({
+                                    type: "youWinPot",
+                                    cards: snapPot,
+                                }))
+                            } else {
+                                key.send(JSON.stringify({
+                                    type: "potWon",
+                                    player: game.lobby.get(playerWS).id,
+                                }))
+                            }
+                            
+                        });
+                    }
+                    
                 }
-                
+
             }
         }
     }
@@ -269,7 +275,7 @@ function removePlayerByWebSocket(lobby, wss) {
 function setNextPlayerTurn(lobby, currentPlayer) {
     if (lobby.has(wss)) {
         const playersWS = Array.from(lobby.keys());
-        const playerIndex = (playersWS.findIndex(playerws => playerws == wss) + 1) % lobby.length
+        const playerIndex = (playersWS.findIndex(playerws => playerws == currentPlayer) + 1) % lobby.length
 
         lobby.forEach(player => player.turn = false);
         lobby.get(playersWS[playerIndex]).turn = true;
