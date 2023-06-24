@@ -103,19 +103,10 @@ export async function leaveGame(joinCode, playerWS){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
         if (game.started === true) {
-            const leavePlayer = game.lobby.get(playerWS);
+            const playerLeft = game.lobby.get(playerWS);
             const result = await deckAPI.addCard(game.deck_id, game.lobby.get(playerWS).currentHand);
-            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
-            activeGames.get(joinCode).lobby.forEach((value, key) => {
-                if (playerWS != key) {
-                    key.send(JSON.stringify({
-                        type: "leave",
-                        player: leavePlayer.id
-                    }))
-                }
-            })
+            activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerLeft);
         }
-        activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerWS);
         if (activeGames.get(joinCode).lobby.size === 0) {
             activeGames.delete(joinCode);
         }
@@ -164,7 +155,7 @@ export async function startGame(joinCode, playerWS){
                     players: lobbyInfo
                 }))
 
-                if (playerWS === key) {
+                if (randomPlayer === key) {
                     key.send(JSON.stringify({
                         type: "yourTurn",
                         player: value.id
@@ -200,26 +191,17 @@ export async function playCard(joinCode, playerWS){
             const result = await deckAPI.addPile(game.deck_id, [card.code]);
             game.lobby.get(playerWS).currentHand.unshift()
             
-            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
-
-            let currentPlayer = null;
-            activeGames.get(joinCode).lobby.forEach((value) => {
-                if (value.turn == true) {
-                    currentPlayer = value;
-                }
-            })
             game.lobby.forEach( (value, key) => {
                 key.send(JSON.stringify({
                     type: "placed",
                     card: card,
                     player: game.lobby.get(playerWS).id,
                 }))
+            })
+                
+            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
 
-                key.send(JSON.stringify({
-                    type: (playerWS === key)?"yourTurn":"playerTurn",
-                    player: currentPlayer.id,
-                }))
-            });
+            
         }
     }
 }
@@ -278,15 +260,17 @@ export async function snap(joinCode, playerWS){
 
 function removePlayerByWebSocket(lobby, wss) {
     if (lobby.has(wss)) {
+        const playerLeft = lobby.get(wss)
         lobby.forEach((value, key) => {
             key.send(JSON.stringify({
-                type: "response",
-                message: `Player ${lobby.get(wss).id} left game!`
+                type: "leave",
+                player: playerLeft.id
             }))
         });
-        lobby = setNextPlayerTurn(lobby, wss)
         lobby.delete(wss)
-        
+        if (lobby.started === true && playerLeft.turn === true) {
+            lobby = setNextPlayerTurn(lobby, wss)
+        }
     }
 
     return lobby
@@ -297,8 +281,14 @@ function setNextPlayerTurn(lobby, currentPlayer) {
         const playersWS = Array.from(lobby.keys());
         const playerIndex = (playersWS.findIndex(playerws => playerws === currentPlayer) + 1) % lobby.size
 
-        lobby.forEach(player => player.turn = false);
+        lobby.forEach((player) => player.turn = false);
         lobby.get(playersWS[playerIndex]).turn = true;
+        lobby.forEach( (value, key) => {
+            key.send(JSON.stringify({
+                type: (currentPlayer === key)?"yourTurn":"playerTurn",
+                player: lobby.get(playersWS[playerIndex]).id,
+            }))
+        });
     }
 
     return lobby
