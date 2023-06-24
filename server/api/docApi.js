@@ -59,8 +59,9 @@ export async function drawPile(deck_id, count){
 
     const params = new URLSearchParams();
     params.append('count', count);
-    const response = await fetch(`https://deckofcardsapi.com/api/deck/${deck_id}/pile/SnapPot/draw/random/${params}`)
-      
+
+    const response = await fetch(`https://deckofcardsapi.com/api/deck/${deck_id}/pile/SnapPot/draw/random/?${params}`)
+
     return response.json()
 }
 

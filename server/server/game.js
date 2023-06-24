@@ -220,39 +220,40 @@ export async function snap(joinCode, playerWS){
         if (game.snapCalled === false) {
             activeGames.get(joinCode).snapCalled = true;
             if (game.started === true) {
-                const pile = await deckAPI.listPile(game.deck_id);
-                const firstCard = pile[pile.length - 1];
-                const secondCard = pile[pile.length - 2];
-                if (firstCard.value === secondCard.value) {
-                    if (pile.length + game.lobby.get(playerWS).currentHand.length === 52) {
-                        game.lobby.forEach( (value, key) => {
-                            key.send(JSON.stringify({
-                                type: "gameOver",
-                                winner: game.lobby.get(playerWS).id,
-                            }))
-                        });
-                    } else {
-                        const snapPot = await deckAPI.drawPile(game.deck_id, pile.length);
-                        activeGames.get(joinCode).lobby.get(playerWS).currentHand = snapPot;
-
-                        game.lobby.forEach( (value, key) => {
-                            if (key === playerWS) {
+                deckAPI.listPile(game.deck_id).then(pile => {
+                    const firstCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 1];
+                    const secondCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 2];
+                    if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
+                        if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 52) {
+                            game.lobby.forEach( (value, key) => {
                                 key.send(JSON.stringify({
-                                    type: "youWinPot",
-                                    cards: snapPot,
+                                    type: "gameOver",
+                                    winner: game.lobby.get(playerWS).id,
                                 }))
-                            } else {
-                                key.send(JSON.stringify({
-                                    type: "potWon",
-                                    player: game.lobby.get(playerWS).id,
-                                }))
-                            }
-                            
-                        });
+                            });
+                        } else {
+                            console.log("JackPot!");
+                            deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
+                                console.log(snapPot);
+                                activeGames.get(joinCode).lobby.get(playerWS).currentHand = snapPot;
+                                game.lobby.forEach( (value, key) => {
+                                    if (key === playerWS) {
+                                        key.send(JSON.stringify({
+                                            type: "youWinPot",
+                                            cards: snapPot,
+                                        }))
+                                    } else {
+                                        key.send(JSON.stringify({
+                                            type: "potWon",
+                                            player: game.lobby.get(playerWS).id,
+                                        }))
+                                    }
+                                    
+                                });
+                            });
+                        }
                     }
-                    
-                }
-
+                });
             }
         }
     }
