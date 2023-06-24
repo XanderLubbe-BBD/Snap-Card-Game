@@ -235,7 +235,7 @@ export async function snap(joinCode, playerWS){
                             console.log("JackPot!");
                             deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
                                 console.log(snapPot);
-                                activeGames.get(joinCode).lobby.get(playerWS).currentHand = snapPot;
+                                activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot);
                                 game.lobby.forEach( (value, key) => {
                                     if (key === playerWS) {
                                         key.send(JSON.stringify({
@@ -279,8 +279,12 @@ function removePlayerByWebSocket(lobby, wss) {
 
 function setNextPlayerTurn(lobby, currentPlayer) {
     if (lobby.has(currentPlayer)) {
+        let count = 1;
         const playersWS = Array.from(lobby.keys());
-        const playerIndex = (playersWS.findIndex(playerws => playerws === currentPlayer) + 1) % lobby.size
+        let playerIndex = getPlayerIndex(playersWS, currentPlayer, count, lobby.size)
+        // while (lobby.get(playersWS[playerIndex]).currentHand == []) {
+        //     playerIndex = getPlayerIndex(playersWS, currentPlayer, ++count, lobby.size)
+        // }
 
         lobby.forEach((player) => player.turn = false);
         lobby.get(playersWS[playerIndex]).turn = true;
@@ -293,6 +297,10 @@ function setNextPlayerTurn(lobby, currentPlayer) {
     }
 
     return lobby
+}
+
+function getPlayerIndex(playerArray, currentPlayer, count, size){
+    return (playerArray.findIndex(playerws => playerws === currentPlayer) + count) % size
 }
 
 function validatePlayerByWebSocket(joinCode, wss) {
