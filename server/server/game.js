@@ -220,11 +220,10 @@ export async function playCard(joinCode, playerWS){
             if (redistribute === true) {
                 game.lobby = activeGames.get(joinCode).lobby = await setPlayersHand(activeGames.get(joinCode), redistribute);
 
+                console.log(Array.from(game.lobby.values()));
                 const lobbyInfo = getPlayerCardCount(game.lobby);
 
                 game.lobby.forEach( (value, key) => {
-                    value.timesPlayed = 0;
-
                     key.send(JSON.stringify({
                         type: "redistribute",
                         players: lobbyInfo
@@ -258,7 +257,7 @@ export async function snap(joinCode, playerWS){
                         for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
                             player.timesPlayed = 0;
                         }
-                        if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 52) {
+                        if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 10) {
                             game.lobby.forEach( (value, key) => {
                                 key.send(JSON.stringify({
                                     type: "gameOver",
@@ -363,12 +362,14 @@ async function  setPlayersHand(game, redistribute, randomPlayer = null){
             player.currentHand = currentHand.cards;
         } else if (redistribute === true) {
             if (player.timesPlayed > 0) {
+                console.log(player.timesPlayed);
                 const currentHand = await deckAPI.drawPile(game.deck_id, player.timesPlayed);
 
                 player.currentHand = currentHand.cards;
             } else {
-                player.currentHand = [];
+                player.currentHand = new Array();
             }
+            player.timesPlayed = 0;
         }
     }
 
