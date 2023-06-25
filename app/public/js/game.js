@@ -7,6 +7,34 @@ let numPlayers = "";
 
 const debug = true;
 
+if(debug){
+    let pId = document.createElement("p");
+    pId.style.position = "absolute";
+    pId.style.top = "0";
+    pId.style.right = "0";
+    pId.textContent = myId;
+    pId.style.color = "red";
+    pId.id = "debugId";
+    document.body.appendChild(pId);
+
+    let input = document.createElement("input");
+    input.style.position = "absolute";
+    input.style.top = "50px";
+    input.style.right = "0";
+    input.id = "debugInput";
+    document.body.appendChild(input);
+    input.addEventListener("keyup", (e) => {
+        pId.textContent = e.target.value;
+        myId = e.target.value;
+    });
+
+    let debugMsg = document.createElement("p");
+    debugMsg.style.position = "absolute";
+    debugMsg.style.top = "50px";
+    debugMsg.style.color = "red"
+    debugMsg.textContent = "debug mode enabled";
+}
+
 let playerIds = [];
 
 let urlParams = new URLSearchParams(window.location.search);
@@ -165,18 +193,27 @@ function addJoinElements() {
 }
 
 function createGame() {
-    myId = "player";
+    if(debug){
+        document.getElementById("debugId").innerText = myId;
+        if(myId == ""){
+            myId = "player";
+        }
+    }
+    
     let msg = {
         type: "create",
         id: myId
     }
-    console.log("Sending:");
-    console.log(msg);
     sendMessage(msg);
 }
 
 function joinGame() {
-    myId = "player2"
+    if(debug){
+        document.getElementById("debugId").innerText = myId;
+        if(myId == ""){
+            myId = "player2"
+        }
+    }
     jCode = "";
 
     let digits = document.getElementsByClassName("singleInput");
@@ -192,6 +229,8 @@ function joinGame() {
     sendMessage(msg);
 
     waitingToJoin = true;
+
+    
 }
 
 function startGame(players) {
@@ -332,16 +371,15 @@ function startGame(players) {
 function clearPage() {
     document.getElementsByClassName("box")[0].style.transform = "translateY(100px)";
     document.getElementsByTagName("footer")[0].style.transform = "translateY(100px)";
-    document.getElementsByTagName("header")[0].style.transform = "translateY(100px)";
 
     document.getElementsByClassName("box")[0].style.opacity = "0";
     document.getElementsByTagName("footer")[0].style.opacity = "0";
-    document.getElementsByTagName("header")[0].style.opacity = "0";
+
+    document.getElementById("snapy").remove();
 
     setTimeout(() => {
         document.getElementsByClassName("box")[0].remove();
         document.getElementsByTagName("footer")[0].remove();
-        document.getElementsByTagName("header")[0].remove();
     }, 1000);
 
     window.scrollTo(0, 0);
@@ -349,9 +387,9 @@ function clearPage() {
 
 function clearGamePage(){
     let cards = document.getElementsByClassName("whole-card");
-    for(let i = 0; i < cards.length; i++){
-        cards[i].remove();
-    }
+    [...cards].forEach(card => {
+       card.remove(); 
+    });
     document.getElementById("callSnap").remove();
 }
 

@@ -14,7 +14,7 @@ ws.addEventListener('message', function (event) {
             document.getElementById("join-code").textContent = jCode;
             break;
         case "join":
-            if(waitingToJoin){
+            if (waitingToJoin) {
                 showWaiting();
                 waitingToJoin = false;
             } else {
@@ -23,31 +23,52 @@ ws.addEventListener('message', function (event) {
                     li.innerText = msg.player;
                     document.getElementById("playerList").appendChild(li);
                 } catch (e) {
-                    
+
                 }
             }
-            
+
             break;
         case "start":
             startGame(msg.players);
             break;
         case "yourTurn":
             myTurn = true;
+
+            let topCard1 = document.getElementsByClassName("my-cards");
+            topCard1[0].classList.add("highlight");
+
+            for(let i = 0; i < playerIds.length; i++){
+                document.getElementsByClassName(`p${i+1}-cards`)[0].classList.remove("highlight");
+            }
+
+
             break;
         case "playerTurn":
             myTurn = false;
+
+            let topCard2 = document.getElementsByClassName("my-cards");
+            topCard2[0].classList.remove("highlight");
+
+            for(let i = 0; i < playerIds.length; i++){
+                document.getElementsByClassName(`p${i+1}-cards`)[0].classList.remove("highlight");
+            }
+
+            let otherPlayer = getPlayerIndex(msg.player);
+            document.getElementsByClassName(`p${otherPlayer+1}-cards`)[0].classList.add("highlight");
+
+
             break;
         case "placed":
             let card = msg.card;
             let player = msg.player;
 
             let elements = document.getElementsByClassName("whole-card");
-            
+
             elements = [...elements].filter(element => {
                 return element.getAttribute("data-id") === player;
             });
 
-            let nextCard = elements[elements.length-1];
+            let nextCard = elements[elements.length - 1];
 
             nextCard.getElementsByClassName("card-front")[0].src = `/images/cards/${card.code}.png`;
             nextCard.classList.add("in-center");
@@ -60,10 +81,18 @@ ws.addEventListener('message', function (event) {
 
             clearGamePage();
 
+            let header = document.getElementsByTagName("header")[0];
+            let logo = document.createElement("img");
+            logo.src = "/images/logo.svg";
+            logo.id = "snapy";
+            logo.alt = "Snapy";
+
+            header.appendChild(logo);
+
             let h1 = document.createElement("h1");
             h1.textContent = `Game Over!`;
             let h2 = document.createElement("h2");
-            h1.textContent = `${winner} won!`;
+            h2.textContent = `${winner} won!`;
 
             let box = document.createElement("section");
             box.classList.add("box");
@@ -71,8 +100,15 @@ ws.addEventListener('message', function (event) {
             box.appendChild(h1);
             box.appendChild(h2);
 
-            document.body.appendChild(box);
-            
+            let backBtn = document.createElement("a");
+            backBtn.textContent = "Back to home";
+            backBtn.href = "/home";
+            backBtn.setAttribute("type", "button")
+            box.appendChild(backBtn);
+
+            document.getElementsByTagName("main")[0].appendChild(box);
+
+
             break;
         case "youWinPot":
             let myNewCards = document.getElementsByClassName("in-center");
@@ -84,24 +120,24 @@ ws.addEventListener('message', function (event) {
                 card.style.zIndex = "initial";
                 card.getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
                 card.removeEventListener("click", () => {
-                    if(myTurn){
+                    if (myTurn) {
                         let msg = {
                             type: "place",
                             joinCode: jCode
                         }
                         sendMessage(msg);
-    
+
                         myTurn = false;
                     }
                 });
                 card.addEventListener("click", () => {
-                    if(myTurn){
+                    if (myTurn) {
                         let msg = {
                             type: "place",
                             joinCode: jCode
                         }
                         sendMessage(msg);
-    
+
                         myTurn = false;
                     }
                 });
@@ -114,7 +150,7 @@ ws.addEventListener('message', function (event) {
 
             [...playerNewCards].map(card => {
                 card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
-                card.classList.add(`p${getPlayerIndex(winningPlayer)+1}-cards`);
+                card.classList.add(`p${getPlayerIndex(winningPlayer) + 1}-cards`);
                 card.setAttribute("data-id", `${winningPlayer}`);
                 card.style.zIndex = "initial";
                 card.getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
@@ -130,11 +166,11 @@ ws.addEventListener('message', function (event) {
                 return element.getAttribute("data-id") === playerId;
             });
 
-            for(let i = 0; i < leaveElems.length; i++){
+            for (let i = 0; i < leaveElems.length; i++) {
                 leaveElems[i].classList.add("in-center");
                 leaveElems[i].removeAttribute("data-id");
             }
-            
+
 
             break;
         case "debug":
@@ -149,12 +185,12 @@ function sendMessage(data) {
     ws.send(JSON.stringify(data));
 }
 
-function checkCardSync(players){
+function checkCardSync(players) {
     console.log("[INFO] Comparing number of cards on front-end and back-end...");
-    
+
     let checkArr = [];
 
-    for(let i = 0; i < players.length; i++){
+    for (let i = 0; i < players.length; i++) {
         let playerId = players[i].id;
         let playerCards = players[i].cards;
 
