@@ -207,6 +207,17 @@ ws.addEventListener('message', function (event) {
                 set.forEach(card => {
                     card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
                     card.setAttribute("data-id", `${players[i].id}`);
+
+                    card.removeEventListener("click", () => {
+                        if (myTurn) {
+                            let msg = {
+                                type: "place",
+                                joinCode: jCode
+                            }
+                            sendMessage(msg);
+                        }
+                    });
+
                     if (myId == players[i].id) {
                         card.classList.add("my-cards");
 
@@ -221,7 +232,6 @@ ws.addEventListener('message', function (event) {
                         });
                     } else {
                         card.classList.add(`p${getPlayerIndex(players[i].id) + 1}-cards`);
-                        card.setAttribute("data-id", `${players[i].id}`);
                     }
                 });
             }

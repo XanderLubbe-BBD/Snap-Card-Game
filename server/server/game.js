@@ -1,5 +1,7 @@
 import * as deckAPI from '../api/docApi.js';
 
+const debugMode = true;
+
 /**
  * 
  * @param {Object} Player
@@ -24,8 +26,13 @@ const activeGames = new Map();
  * Creates a new active game
  */
 export async function createGame(playerInfo, playerWS){
-    const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-    const joinCode = getRandomCode();
+    let joinCode;
+    if(debugMode){
+        joinCode = "00000";
+    } else {
+        const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
+        joinCode = getRandomCode();
+    }
 
     let lobby = new Map();
     lobby.set(playerWS, new Player(playerInfo))
@@ -337,8 +344,13 @@ function getPlayerIndex(playerArray, currentPlayer, count, size){
 async function  setPlayersHand(game, redistribute, randomPlayer = null){
     for (let [playerSocket, player] of game.lobby.entries()) {
         if (redistribute === false) {
-            // const numCard = Math.floor(52 / game.lobby.size);
-            const numCard = 3;
+            let numCard;
+            if(debugMode){
+                numCard = 3;
+            } else {
+                numCard = Math.floor(52 / game.lobby.size);
+            }
+            
 
             let currentHand = null;
             if (game.lobby.size === 3 && playerSocket === randomPlayer) {
