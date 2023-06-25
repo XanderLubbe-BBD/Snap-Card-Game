@@ -14,20 +14,8 @@ app.listen(8082, () => {
     console.log("Server running on port 8082");
 });
 
-app.get("/history/:token")
-
-//use this to get email 
-app.get("/email/:token", (req, res) => {
-    getLoggedInUserEmail(req.params.token, res);
-});
-
-app.get("/history/:token", (req, res) => {
-    const token = req.params.token;
-    verifyEmail(token,res);
-});
-
-function getHistory(playerEmail, res){
-    console.log(playerEmail);
+app.get("/history/:token", verifyEmail, (req, res) => {
+    const playerEmail = res.locals.email;
     const query = `SELECT game_id, game_players.player_id, players.username FROM Game_Players INNER JOIN players ON players.player_id = game_players.player_id WHERE game_id IN (SELECT game_id FROM Game_Players WHERE player_id = (SELECT player_id FROM players WHERE email = ?))`;
     pool.query(query, [playerEmail], (err, rows, fields) => {
         if (!err) {
@@ -55,12 +43,14 @@ function getHistory(playerEmail, res){
             res.status(400).send(fields);
         };
     });
-}
 
-async function verifyEmail(token, res){
+});
+
+async function verifyEmail(req, res, next){
+    const token = req.params.token;
     let result = await getAuth("email", token);
-    let email = result.email;
-    getHistory(email, res);
+    res.locals.email = result.email;
+    next();
 }
 
 const getAuth = async (url, header) => {
