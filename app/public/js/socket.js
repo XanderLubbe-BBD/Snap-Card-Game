@@ -189,6 +189,15 @@ ws.addEventListener('message', function (event) {
                 card.removeAttribute("data-id");
             });
 
+            let leftPersonMsg = document.createElement("p");
+            leftPersonMsg.textContent = `${playerId} left the game`;
+            leftPersonMsg.classList.add(`p${getPlayerIndex(playerId) + 1}-cards`, `${numPlayers}`);
+            leftPersonMsg.style.width = "100px";
+            leftPersonMsg.style.color = "white";
+            leftPersonMsg.style.textAlign = "center";
+
+            document.body.appendChild(leftPersonMsg);
+
             break;
         case "redistribute":
             let players = msg.players;
