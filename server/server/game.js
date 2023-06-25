@@ -146,7 +146,6 @@ export async function startGame(joinCode, playerWS){
         let game = activeGames.get(joinCode);
 
         if (game.started === false) {
-            const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
 
             activeGames.get(joinCode).lobby = await setPlayersHand(game, Array.from(game.lobby.values()).every( player => player.currentHand === []));
 
@@ -338,6 +337,7 @@ function getPlayerIndex(playerArray, currentPlayer, count, size){
 async function setPlayersHand(game, redistribute){
     for (let [playerSocket, player] of game.lobby.entries()) {
         if (redistribute === false) {
+            const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
             const numCard = Math.floor(52 / game.lobby.size);
 
             let currentHand = null;
