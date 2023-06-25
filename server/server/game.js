@@ -312,7 +312,8 @@ function setNextPlayerTurn(lobby, currentPlayer) {
         let count = 1;
         const playersWS = Array.from(lobby.keys());
         let playerIndex = getPlayerIndex(playersWS, currentPlayer, count, lobby.size)
-        while (lobby.get(playersWS[playerIndex]).currentHand == []) {
+
+        while (lobby.get(playersWS[playerIndex]).currentHand.length <= 0) {
             playerIndex = getPlayerIndex(playersWS, lobby.get(playersWS[playerIndex]), count, lobby.size)
         }
 
@@ -330,7 +331,8 @@ function setNextPlayerTurn(lobby, currentPlayer) {
 }
 
 function getPlayerIndex(playerArray, currentPlayer, count, size){
-    return (playerArray.findIndex(playerws => playerws === currentPlayer) + count) % size
+    const result = (playerArray.findIndex(playerws => playerws === currentPlayer) + count) % size
+    return result
 }
 
 async function setPlayersHand(game, redistribute){
