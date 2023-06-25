@@ -302,6 +302,11 @@ function startGame(players) {
             });
         }
 
+        let myCountSpot = document.createElement("h5");
+        myCountSpot.innerText = myCards;
+        myCountSpot.id = "my-count";
+        document.body.appendChild(myCountSpot);
+
         // Other players
         for(let i = 0; i < players.length; i++){
             

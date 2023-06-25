@@ -83,6 +83,9 @@ ws.addEventListener('message', function (event) {
             nextCard.classList.add("in-center");
             nextCard.style.zIndex = zIndexCount++;
             nextCard.removeAttribute("data-id");
+            nextCard.classList.remove("highlight");
+
+            updateCardAmounts();
 
             break;
         case "gameOver":
@@ -152,6 +155,8 @@ ws.addEventListener('message', function (event) {
                 });
             });
 
+            updateCardAmounts();
+
             break;
         case "potWon":
             let playerNewCards = document.getElementsByClassName("in-center");
@@ -164,6 +169,8 @@ ws.addEventListener('message', function (event) {
                 card.style.zIndex = "initial";
                 card.getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
             });
+
+            updateCardAmounts();
 
             break;
         case "leave":
@@ -183,9 +190,15 @@ ws.addEventListener('message', function (event) {
 
             break;
         case "redistribute":
+
+            console.log("redistributing cards mofo!");
             // stuff
             let players = msg.players;
-            let cards = [...document.getElementsByClassName("whole-cards")];
+            let cards = [...document.getElementsByClassName("whole-card")];
+
+            // cards.forEach(card => {
+            //     card.classList.remove("in-center");
+            // });
 
             for (let i = 0; i < players.length; i++) {
                 let set = cards.slice(0, players[i].cards);
@@ -193,7 +206,7 @@ ws.addEventListener('message', function (event) {
 
                 set.forEach(card => {
                     card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
-                    cards.setAttribute("data-id", `${players[i].id}`);
+                    card.setAttribute("data-id", `${players[i].id}`);
                     if (myId == players[i].id) {
                         card.classList.add("my-cards");
 
@@ -212,6 +225,8 @@ ws.addEventListener('message', function (event) {
                     }
                 });
             }
+
+            updateCardAmounts();
 
             break;
         case "debug":
@@ -249,11 +264,11 @@ function checkCardSync(players) {
     console.log(`${checkArr.every(element => element) ? "[SUCCESS]" : "[ERROR]"} Sync check ${checkArr.every(element => element) ? "passed" : "failed"}`);
 }
 
-// function updateCardAmounts(){
-//     let elements = document.getElementsByClassName("my-cards");
-//     elements = [...elements].filter(element => {
-//         return element.getAttribute("data-id") == myId;
-//     });
+function updateCardAmounts(){
+    let elements = document.getElementsByClassName("my-cards");
+    elements = [...elements].filter(element => {
+        return element.getAttribute("data-id") == myId;
+    });
 
-
-// }
+    document.getElementById("my-count").textContent = elements.length;
+}

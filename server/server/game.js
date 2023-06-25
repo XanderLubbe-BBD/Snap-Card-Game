@@ -337,7 +337,8 @@ function getPlayerIndex(playerArray, currentPlayer, count, size){
 async function  setPlayersHand(game, redistribute, randomPlayer = null){
     for (let [playerSocket, player] of game.lobby.entries()) {
         if (redistribute === false) {
-            const numCard = Math.floor(52 / game.lobby.size);
+            // const numCard = Math.floor(52 / game.lobby.size);
+            const numCard = 3;
 
             let currentHand = null;
             if (game.lobby.size === 3 && playerSocket === randomPlayer) {
@@ -353,6 +354,8 @@ async function  setPlayersHand(game, redistribute, randomPlayer = null){
                 const currentHand = await deckAPI.drawPile(game.deck_id, player.timesPlayed);
 
                 player.currentHand = currentHand.cards;
+            } else {
+                player.currentHand = [];
             }
         }
     }
@@ -372,7 +375,7 @@ function validatePlayerByWebSocket(joinCode, wss) {
 
 function getPlayerCardCount(lobby){
     const result = Array.from(lobby.values()).map( values => {
-        return {"id": values.id, "cards": values.currentHand.length}
+        return {"id": values.id, "cards": values.currentHand ? values.currentHand.length : 0}
     });
 
     return result;
