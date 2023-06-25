@@ -148,15 +148,13 @@ export async function startGame(joinCode, playerWS){
         if (game.started === false) {
             const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
 
-            activeGames.get(joinCode).lobby = await setPlayersHand(game, false, randomPlayer);
+            game.lobby = activeGames.get(joinCode).lobby = await setPlayersHand(game, false, randomPlayer);
 
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
             activeGames.get(joinCode).started = true;
 
-            const lobbyInfo = Array.from(activeGames.get(joinCode).lobby.values()).map( values => {
-                return {"id": values.id, "cards": values.currentHand.length}
-            });
+            const lobbyInfo = getPlayerCardCount(game.lobby);
 
             activeGames.get(joinCode).lobby.forEach( (value, key) => {
                 key.send(JSON.stringify({
@@ -213,11 +211,9 @@ export async function playCard(joinCode, playerWS){
             })
             const redistribute = Array.from(activeGames.get(joinCode).lobby.values()).every( player => player.currentHand.length <= 0);
             if (redistribute === true) {
-                activeGames.get(joinCode).lobby = setPlayersHand(activeGames.get(joinCode), redistribute);
-                
-                const lobbyInfo = Array.from(activeGames.get(joinCode).lobby.values()).map( values => {
-                    return {"id": values.id, "cards": values.currentHand.length}
-                });
+                game.lobby = activeGames.get(joinCode).lobby = await setPlayersHand(activeGames.get(joinCode), redistribute);
+
+                const lobbyInfo = getPlayerCardCount(game.lobby);
 
                 game.lobby.forEach( (value, key) => {
                     value.timesPlayed = 0;
@@ -372,6 +368,14 @@ function validatePlayerByWebSocket(joinCode, wss) {
     }
 
     return false
+}
+
+function getPlayerCardCount(lobby){
+    const result = Array.from(lobby.values()).map( values => {
+        return {"id": values.id, "cards": values.currentHand.length}
+    });
+
+    return result;
 }
 
 // debug
