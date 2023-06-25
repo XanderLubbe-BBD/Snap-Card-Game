@@ -7,6 +7,23 @@ let numPlayers = "";
 
 const debug = true;
 
+if (debug) {
+    fetch("https://randomuser.me/api/").then((response) => {
+        response.json().then((data) => {
+            myId = data.results[0].name.first;
+
+            let pId = document.createElement("p");
+            pId.style.position = "absolute";
+            pId.style.top = "0";
+            pId.style.right = "0";
+            pId.textContent = myId;
+            pId.style.color = "red";
+            pId.id = "debugId";
+            document.body.appendChild(pId);
+        });
+    });
+}
+
 let playerIds = [];
 
 let urlParams = new URLSearchParams(window.location.search);
@@ -165,18 +182,25 @@ function addJoinElements() {
 }
 
 function createGame() {
-    myId = "player";
+    if (debug) {
+        if (myId == "") {
+            myId = "player";
+        }
+    }
+
     let msg = {
         type: "create",
         id: myId
     }
-    console.log("Sending:");
-    console.log(msg);
     sendMessage(msg);
 }
 
 function joinGame() {
-    myId = "player2"
+    if (debug) {
+        if (myId == "") {
+            myId = "player2"
+        }
+    }
     jCode = "";
 
     let digits = document.getElementsByClassName("singleInput");
@@ -192,6 +216,8 @@ function joinGame() {
     sendMessage(msg);
 
     waitingToJoin = true;
+
+
 }
 
 function startGame(players) {
@@ -207,16 +233,16 @@ function startGame(players) {
         for (let i = 0; i < totalPlayers; i++) {
             let id = players[i].id;
 
-            if (id = myId) {
+            if (id == myId) {
                 myCards = players[i].cards;
                 myIndex = i;
                 break;
             }
         }
 
-        if(totalPlayers == 2){
+        if (totalPlayers == 2) {
             totalPlayers = "two";
-        } else if(totalPlayers == 3){
+        } else if (totalPlayers == 3) {
             totalPlayers = "three";
         } else {
             totalPlayers = "four";
@@ -227,6 +253,7 @@ function startGame(players) {
         players = players.filter(player => {
             return player.id != myId;
         });
+        console.log(`Creating ${myCards} cards for myself`);
 
         // add my cards
         for (let i = 0; i < myCards; i++) {
@@ -250,7 +277,7 @@ function startGame(players) {
             document.body.appendChild(article);
 
             article.addEventListener("click", () => {
-                if(myTurn){
+                if (myTurn) {
                     let msg = {
                         type: "place",
                         joinCode: jCode
@@ -262,18 +289,26 @@ function startGame(players) {
             });
         }
 
+        let myCountSpot = document.createElement("h5");
+        myCountSpot.innerText = myCards;
+        myCountSpot.id = "my-count";
+        document.body.appendChild(myCountSpot);
+
         // Other players
-        for(let i = 0; i < players.length; i++){
+        for (let i = 0; i < players.length; i++) {
+
             playerIds.push(players[i].id);
             let numCards = players[i].cards;
+
+            console.log(`Creating ${numCards} cards for ${players[i].id}`);
 
             let article;
             let cardback;
             let cardfront;
 
-            for(let j = 0; j < numCards; j++){
+            for (let j = 0; j < numCards; j++) {
                 article = document.createElement("article");
-                article.classList.add(`p${i+1}-cards`);
+                article.classList.add(`p${i + 1}-cards`);
                 article.classList.add("whole-card");
                 article.classList.add(totalPlayers);
                 article.setAttribute("data-id", `${players[i].id}`);
@@ -307,7 +342,7 @@ function startGame(players) {
         });
 
         // TODO: remove debug stuff
-        if(debug){
+        if (debug) {
             let debugBtn = document.createElement("button");
             debugBtn.textContent = "Request Debug";
             debugBtn.style.position = "absolute";
@@ -316,14 +351,14 @@ function startGame(players) {
             document.body.appendChild(debugBtn);
 
             debugBtn.addEventListener("click", () => {
-               let msg = {
-                   type: "debug",
-                   joinCode: jCode
-               };
-               sendMessage(msg);
+                let msg = {
+                    type: "debug",
+                    joinCode: jCode
+                };
+                sendMessage(msg);
             });
         }
-        
+
     }, 1000);
 
 
@@ -332,26 +367,25 @@ function startGame(players) {
 function clearPage() {
     document.getElementsByClassName("box")[0].style.transform = "translateY(100px)";
     document.getElementsByTagName("footer")[0].style.transform = "translateY(100px)";
-    document.getElementsByTagName("header")[0].style.transform = "translateY(100px)";
 
     document.getElementsByClassName("box")[0].style.opacity = "0";
     document.getElementsByTagName("footer")[0].style.opacity = "0";
-    document.getElementsByTagName("header")[0].style.opacity = "0";
+
+    document.getElementById("snapy").remove();
 
     setTimeout(() => {
         document.getElementsByClassName("box")[0].remove();
         document.getElementsByTagName("footer")[0].remove();
-        document.getElementsByTagName("header")[0].remove();
     }, 1000);
 
     window.scrollTo(0, 0);
 }
 
-function clearGamePage(){
+function clearGamePage() {
     let cards = document.getElementsByClassName("whole-card");
-    for(let i = 0; i < cards.length; i++){
-        cards[i].remove();
-    }
+    [...cards].forEach(card => {
+        card.remove();
+    });
     document.getElementById("callSnap").remove();
 }
 
@@ -366,7 +400,7 @@ function createGameButtons() {
 function callSnap() {
     let elements = document.getElementsByClassName("in-center");
 
-    if(elements.length >= 2){
+    if (elements.length >= 2) {
         let msg = {
             type: "snap",
             joinCode: jCode
@@ -388,7 +422,7 @@ function getPlayerIndex(id) {
     }
 }
 
-function preLoadCardImages(){
+function preLoadCardImages() {
     preloads = [
         "/images/cards/back.png",
         "/images/cards/blank.png",
@@ -448,7 +482,7 @@ function preLoadCardImages(){
 
     var tempImg = []
 
-    for(let i = 0; i < preloads.length; i++) {
+    for (let i = 0; i < preloads.length; i++) {
         tempImg[i] = new Image();
         tempImg[i].src = preloads[i];
     }

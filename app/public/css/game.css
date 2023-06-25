@@ -14,6 +14,21 @@
     transform: rotateX(0deg);
 }
 
+#my-count {
+    position: absolute;
+    bottom: 100px;
+    left: calc(50% + 169.5px);
+    color: green;
+    font-size: 48px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.my-cards:hover {
+    cursor: pointer;
+}
+
 .my-cards img {
     height: 235.5px;
     width: 169.5px;
@@ -77,6 +92,10 @@
     rotate: 0deg;
     transition: 0.3s ease;
     transform-style: preserve-3d;
+}
+
+.whole-card.highlight {
+    filter: drop-shadow(5px 5px 50px white);
 }
 
 .whole-card .card-front {
