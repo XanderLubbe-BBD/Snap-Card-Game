@@ -317,7 +317,7 @@ function setNextPlayerTurn(lobby, currentPlayer) {
         let playerIndex = getPlayerIndex(playersWS, currentPlayer, count, lobby.size)
 
         while (lobby.get(playersWS[playerIndex]).currentHand.length <= 0) {
-            playerIndex = getPlayerIndex(playersWS, lobby.get(playersWS[playerIndex]), count, lobby.size)
+            playerIndex = getPlayerIndex(playersWS, playersWS[playerIndex], count, lobby.size)
         }
 
         lobby.forEach((player) => player.turn = false);
