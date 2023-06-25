@@ -190,44 +190,107 @@ ws.addEventListener('message', function (event) {
 
             break;
         case "redistribute":
-
-            console.log("redistributing cards mofo!");
-            // stuff
             let players = msg.players;
-            let cards = [...document.getElementsByClassName("whole-card")];
 
-            // cards.forEach(card => {
-            //     card.classList.remove("in-center");
-            // });
+            let allCards = document.getElementsByTagName("article");
+            [...allCards].forEach(card => {
+                card.remove();
+            });
 
-            for (let i = 0; i < players.length; i++) {
-                let set = cards.slice(0, players[i].cards);
-                cards = cards.slice(players[i].cards, cards.length);
+            let myCards = -1;
+            let myIndex = -1;
+            let totalPlayers = players.length;
+            for (let i = 0; i < totalPlayers; i++) {
+                let id = players[i].id;
 
-                set.forEach(card => {
-                    card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
-                    card.setAttribute("data-id", `${players[i].id}`);
+                if (id == myId) {
+                    myCards = players[i].cards;
+                    myIndex = i;
+                    break;
+                }
+            }
 
-                    let new_element = card.cloneNode(true);
-                    card.parentNode.replaceChild(new_element, card);
-                    card = new_element;
+            if (totalPlayers == 2) {
+                totalPlayers = "two";
+            } else if (totalPlayers == 3) {
+                totalPlayers = "three";
+            } else {
+                totalPlayers = "four";
+            }
 
-                    if (myId == players[i].id) {
-                        card.classList.add("my-cards");
+            numPlayers = totalPlayers;
 
-                        card.addEventListener("click", () => {
-                            if (myTurn) {
-                                let msg = {
-                                    type: "place",
-                                    joinCode: jCode
-                                }
-                                sendMessage(msg);
-                            }
-                        });
-                    } else {
-                        card.classList.add(`p${getPlayerIndex(players[i].id) + 1}-cards`);
+            players = players.filter(player => {
+                return player.id != myId;
+            });
+            console.log(`Creating ${myCards} cards for myself`);
+
+            // add my cards
+            for (let i = 0; i < myCards; i++) {
+                article = document.createElement("article");
+                article.classList.add("my-cards");
+                article.classList.add("whole-card");
+                article.classList.add(totalPlayers);
+                article.setAttribute("data-id", `${myId}`);
+
+                cardback = document.createElement("img");
+                cardback.src = "/images/cards/back.png";
+                cardback.classList.add("card-back");
+
+                cardfront = document.createElement("img");
+                cardfront.src = "/images/cards/blank.png";
+                cardfront.classList.add("card-front");
+
+                article.appendChild(cardback);
+                article.appendChild(cardfront);
+
+                document.body.appendChild(article);
+
+                article.addEventListener("click", () => {
+                    if (myTurn) {
+                        let msg = {
+                            type: "place",
+                            joinCode: jCode
+                        }
+                        sendMessage(msg);
+
+                        myTurn = false;
                     }
                 });
+            }
+
+            // Other players
+            for (let i = 0; i < players.length; i++) {
+
+                playerIds.push(players[i].id);
+                let numCards = players[i].cards;
+
+                console.log(`Creating ${numCards} cards for ${players[i].id}`);
+
+                let article;
+                let cardback;
+                let cardfront;
+
+                for (let j = 0; j < numCards; j++) {
+                    article = document.createElement("article");
+                    article.classList.add(`p${i + 1}-cards`);
+                    article.classList.add("whole-card");
+                    article.classList.add(totalPlayers);
+                    article.setAttribute("data-id", `${players[i].id}`);
+
+                    cardback = document.createElement("img");
+                    cardback.src = "/images/cards/back.png";
+                    cardback.classList.add("card-back");
+
+                    cardfront = document.createElement("img");
+                    cardfront.src = "/images/cards/blank.png";
+                    cardfront.classList.add("card-front");
+
+                    article.appendChild(cardback);
+                    article.appendChild(cardfront);
+
+                    document.body.appendChild(article);
+                }
             }
 
             updateCardAmounts();
@@ -268,7 +331,7 @@ function checkCardSync(players) {
     console.log(`${checkArr.every(element => element) ? "[SUCCESS]" : "[ERROR]"} Sync check ${checkArr.every(element => element) ? "passed" : "failed"}`);
 }
 
-function updateCardAmounts(){
+function updateCardAmounts() {
     let elements = document.getElementsByClassName("my-cards");
     elements = [...elements].filter(element => {
         return element.getAttribute("data-id") == myId;
