@@ -214,7 +214,7 @@ export async function playCard(joinCode, playerWS){
             const redistribute = Array.from(activeGames.get(joinCode).lobby.values()).every( player => player.currentHand.length <= 0);
             if (redistribute === true) {
                 activeGames.get(joinCode).lobby = setPlayersHand(activeGames.get(joinCode), redistribute);
-
+                
                 const lobbyInfo = Array.from(activeGames.get(joinCode).lobby.values()).map( values => {
                     return {"id": values.id, "cards": values.currentHand.length}
                 });

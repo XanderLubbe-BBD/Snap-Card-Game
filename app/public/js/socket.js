@@ -37,8 +37,10 @@ ws.addEventListener('message', function (event) {
             let topCard1 = document.getElementsByClassName("my-cards");
             topCard1[0].classList.add("highlight");
 
-            for(let i = 0; i < playerIds.length; i++){
-                document.getElementsByClassName(`p${i+1}-cards`)[0].classList.remove("highlight");
+            for (let i = 0; i < playerIds.length; i++) {
+                if (document.getElementsByClassName(`p${i + 1}-cards`)[0] != null) {
+                    document.getElementsByClassName(`p${i + 1}-cards`)[0].classList.remove("highlight");
+                }
             }
 
 
@@ -47,14 +49,21 @@ ws.addEventListener('message', function (event) {
             myTurn = false;
 
             let topCard2 = document.getElementsByClassName("my-cards");
-            topCard2[0].classList.remove("highlight");
+            if (topCard2[0] != null) {
+                topCard2[0].classList.remove("highlight");
+            }
 
-            for(let i = 0; i < playerIds.length; i++){
-                document.getElementsByClassName(`p${i+1}-cards`)[0].classList.remove("highlight");
+
+            for (let i = 0; i < playerIds.length; i++) {
+                if (document.getElementsByClassName(`p${i + 1}-cards`)[0] != null) {
+                    document.getElementsByClassName(`p${i + 1}-cards`)[0].classList.remove("highlight");
+                }
             }
 
             let otherPlayer = getPlayerIndex(msg.player);
-            document.getElementsByClassName(`p${otherPlayer+1}-cards`)[0].classList.add("highlight");
+            if (document.getElementsByClassName(`p${otherPlayer + 1}-cards`)[0] != null) {
+                document.getElementsByClassName(`p${otherPlayer + 1}-cards`)[0].classList.add("highlight");
+            }
 
 
             break;
@@ -173,6 +182,38 @@ ws.addEventListener('message', function (event) {
 
 
             break;
+        case "redistribute":
+            // stuff
+            let players = msg.players;
+            let cards = [...document.getElementsByClassName("whole-cards")];
+
+            for (let i = 0; i < players.length; i++) {
+                let set = cards.slice(0, players[i].cards);
+                cards = cards.slice(players[i].cards, cards.length);
+
+                set.forEach(card => {
+                    card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
+                    cards.setAttribute("data-id", `${players[i].id}`);
+                    if (myId == players[i].id) {
+                        card.classList.add("my-cards");
+
+                        card.addEventListener("click", () => {
+                            if (myTurn) {
+                                let msg = {
+                                    type: "place",
+                                    joinCode: jCode
+                                }
+                                sendMessage(msg);
+                            }
+                        });
+                    } else {
+                        card.classList.add(`p${getPlayerIndex(players[i].id) + 1}-cards`);
+                        card.setAttribute("data-id", `${players[i].id}`);
+                    }
+                });
+            }
+
+            break;
         case "debug":
             checkCardSync(msg.players);
         default:
@@ -207,3 +248,12 @@ function checkCardSync(players) {
 
     console.log(`${checkArr.every(element => element) ? "[SUCCESS]" : "[ERROR]"} Sync check ${checkArr.every(element => element) ? "passed" : "failed"}`);
 }
+
+// function updateCardAmounts(){
+//     let elements = document.getElementsByClassName("my-cards");
+//     elements = [...elements].filter(element => {
+//         return element.getAttribute("data-id") == myId;
+//     });
+
+
+// }

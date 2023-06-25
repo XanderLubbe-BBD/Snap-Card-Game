@@ -246,7 +246,7 @@ function startGame(players) {
         for (let i = 0; i < totalPlayers; i++) {
             let id = players[i].id;
 
-            if (id = myId) {
+            if (id == myId) {
                 myCards = players[i].cards;
                 myIndex = i;
                 break;
@@ -266,6 +266,7 @@ function startGame(players) {
         players = players.filter(player => {
             return player.id != myId;
         });
+        console.log(`Creating ${myCards} cards for myself`);
 
         // add my cards
         for (let i = 0; i < myCards; i++) {
@@ -303,8 +304,11 @@ function startGame(players) {
 
         // Other players
         for(let i = 0; i < players.length; i++){
+            
             playerIds.push(players[i].id);
             let numCards = players[i].cards;
+
+            console.log(`Creating ${numCards} cards for ${players[i].id}`);
 
             let article;
             let cardback;
