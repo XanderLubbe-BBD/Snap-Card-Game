@@ -220,16 +220,6 @@ ws.addEventListener('message', function (event) {
                 }
             }
 
-            if (totalPlayers == 2) {
-                totalPlayers = "two";
-            } else if (totalPlayers == 3) {
-                totalPlayers = "three";
-            } else {
-                totalPlayers = "four";
-            }
-
-            numPlayers = totalPlayers;
-
             players = players.filter(player => {
                 return player.id != myId;
             });
@@ -240,7 +230,7 @@ ws.addEventListener('message', function (event) {
                 article = document.createElement("article");
                 article.classList.add("my-cards");
                 article.classList.add("whole-card");
-                article.classList.add(totalPlayers);
+                article.classList.add(numPlayers);
                 article.setAttribute("data-id", `${myId}`);
 
                 cardback = document.createElement("img");
@@ -283,9 +273,9 @@ ws.addEventListener('message', function (event) {
 
                 for (let j = 0; j < numCards; j++) {
                     article = document.createElement("article");
-                    article.classList.add(`p${i + 1}-cards`);
+                    article.classList.add(`p${getPlayerIndex(players[i].id)+1}-cards`);
                     article.classList.add("whole-card");
-                    article.classList.add(totalPlayers);
+                    article.classList.add(numPlayers);
                     article.setAttribute("data-id", `${players[i].id}`);
 
                     cardback = document.createElement("img");
