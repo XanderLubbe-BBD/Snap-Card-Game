@@ -1,3 +1,3 @@
 document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.clear();
+    sessionStorage.clear();
 });

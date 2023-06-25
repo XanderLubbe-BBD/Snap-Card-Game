@@ -32,7 +32,7 @@ const postAuth = async (url, body) => {
     if (res.ok){
         let result = await res.json();
         if(result.token){
-            localStorage.setItem('token', result.token);
+            sessionStorage.setItem('token', result.token);
             window.location.href = `/home/${result.token}`;
         }
     }   

@@ -19,16 +19,32 @@ app.get('/home/:token', verifyUser, function (req, res) {
     res.sendFile(__dirname + '/pages/home.html');
 })
 
+app.get('/home/', function (req, res) {
+    res.redirect('/');
+})
+
 app.get('/game/:token', verifyUser, function (req, res) {
     res.sendFile(__dirname + '/pages/game.html');
+})
+
+app.get('/game/', function (req, res) {
+    res.redirect('/');
 })
 
 app.get('/history/:token',verifyUser, function (req, res) {
     res.sendFile(__dirname + '/pages/history.html');
 })
 
+app.get('/history/', function (req, res) {
+    res.redirect('/');
+})
+
 app.get('/rules/:token', verifyUser,function (req, res) {
     res.sendFile(__dirname + '/pages/rules.html');
+})
+
+app.get('/rules/', function (req, res) {
+    res.redirect('/');
 })
 
 app.all('/*', function (req, res) {
@@ -44,7 +60,6 @@ var server = app.listen(8080, function () {
 async function verifyUser(req,res,next){
     const token = req.params.token;
     const result = await getAuth("verify", token);
-    console.log(result);
     if (result.valid){
         next();
     }
