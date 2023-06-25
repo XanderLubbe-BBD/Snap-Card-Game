@@ -74,6 +74,28 @@ ws.addEventListener('message', function (event) {
                 card.setAttribute("data-id", `${myId}`);
                 card.style.zIndex = "initial";
                 card.getElementsByClassName("card-front")[0].src = `/images/cards/blank.png`;
+                card.removeEventListener("click", () => {
+                    if(myTurn){
+                        let msg = {
+                            type: "place",
+                            joinCode: jCode
+                        }
+                        sendMessage(msg);
+    
+                        myTurn = false;
+                    }
+                });
+                card.addEventListener("click", () => {
+                    if(myTurn){
+                        let msg = {
+                            type: "place",
+                            joinCode: jCode
+                        }
+                        sendMessage(msg);
+    
+                        myTurn = false;
+                    }
+                });
             });
 
             break;
