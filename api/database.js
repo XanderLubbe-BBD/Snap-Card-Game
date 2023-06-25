@@ -13,3 +13,7 @@ pool.connect(function(err) {
   if (err) throw err;
   console.log("Database successfully connected!");
 });
+
+module.exports = {
+    pool
+}
