@@ -20,24 +20,6 @@ if (debug) {
             pId.style.color = "red";
             pId.id = "debugId";
             document.body.appendChild(pId);
-
-            let input = document.createElement("input");
-            input.style.position = "absolute";
-            input.style.top = "50px";
-            input.style.right = "0";
-            input.id = "debugInput";
-            input.value = myId;
-            document.body.appendChild(input);
-            input.addEventListener("keyup", (e) => {
-                pId.textContent = e.target.value;
-                myId = e.target.value;
-            });
-
-            let debugMsg = document.createElement("p");
-            debugMsg.style.position = "absolute";
-            debugMsg.style.top = "50px";
-            debugMsg.style.color = "red"
-            debugMsg.textContent = "debug mode enabled";
         });
     });
 }

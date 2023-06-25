@@ -50,8 +50,9 @@ wss.on('connection', function connection(ws) {
                 break;
         }
     });
-});
 
-wss.on('close', function disconnect(ws) {
-    GameLogic.disconnect(ws);
+    ws.on('close', function disconnect(ws) {
+        console.log("Fucker left! Bastard...");
+        GameLogic.disconnect(ws);
+    });
 });
