@@ -182,11 +182,12 @@ ws.addEventListener('message', function (event) {
                 return element.getAttribute("data-id") === playerId;
             });
 
-            for (let i = 0; i < leaveElems.length; i++) {
+            leaveElems.forEach(card => {
                 leaveElems[i].classList.add("in-center");
+                leaveElems[i].classList.remove("highlight");
+                leaveElems[i].style.zIndex = zIndexCount++;
                 leaveElems[i].removeAttribute("data-id");
-            }
-
+            });
 
             break;
         case "redistribute":
