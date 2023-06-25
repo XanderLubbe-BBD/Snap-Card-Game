@@ -148,7 +148,7 @@ export async function startGame(joinCode, playerWS){
         if (game.started === false) {
             const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
 
-            activeGames.get(joinCode).lobby = await setPlayersHand(game, Array.from(game.lobby.values()).every( player => player.currentHand === []), randomPlayer);
+            activeGames.get(joinCode).lobby = await setPlayersHand(game, Array.from(game.lobby.values()).every( player => player.currentHand.length <= 0), randomPlayer);
 
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
@@ -211,7 +211,7 @@ export async function playCard(joinCode, playerWS){
                     player: game.lobby.get(playerWS).id,
                 }))
             })
-            const redistribute = Array.from(activeGames.get(joinCode).lobby.values()).every( player => player.currentHand === []);
+            const redistribute = Array.from(activeGames.get(joinCode).lobby.values()).every( player => player.currentHand.length <= 0);
             if (redistribute === true) {
                 game.lobby = activeGames.get(joinCode).lobby = setPlayersHand(activeGames.get(joinCode), redistribute);
 
