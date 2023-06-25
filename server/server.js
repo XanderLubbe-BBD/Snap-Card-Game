@@ -45,19 +45,6 @@ wss.on('connection', function connection(ws) {
             case "snap":
                 GameLogic.snap(data.joinCode, ws);
                 break;
-            case "respond":
-                sendMessage(data.message, ws);
-                break;
-            case "broadcast":
-                sendMessage(data.message);
-                break;
-            case "request":
-                fetch(`http://localhost:8082/${data.endpoint}`).then(res => {
-                    res.text().then(data =>
-                        sendMessage(data, ws)
-                    );
-                });
-                break;
             case "debug":
                 GameLogic.debug(data.joinCode, ws);
                 break;
