@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapy Card Game | 404 Page Not Found</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        hr {
+            width: 100%;
+        }
+
+        .box h1,
+        .box h2,
+        .box h3,
+        .box p,
+        .box br,
+        .box hr,
+        .box a,
+        section.box,
+        img {
+            transform: rotate(0deg) translateX(0px) translateY(0px);
+            opacity: 0;
+            transition: 2s linear;
+        }
+
+        .show {
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="/images/logo.svg" alt="Snapy" id="snapy">
+    </header>
+
+    <main>
+        <section class="box">
+            <h1 class="title">404 : Oh no! Something is wrong...</h1>
+            <h2>It looks like you've broken our site 😔</h2>
+            <br />
+            <h3>Nah, just kidding, it seems like this page doesn't exist. Double check the URL or head back to the
+                homepage.</h3>
+            <br />
+            <hr />
+            <br />
+            <a type="button" href="/home">Homepage</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 2023 Snapy</p>
+    </footer>
+
+    <script>
+        let flip = true;
+
+        setInterval(() => {
+            if (flip) {
+                let elements = document.querySelectorAll(".box h1, .box h2, .box h3, .box p, .box br, .box hr, .box a, section.box");
+
+                for (let i = 0; i < elements.length; i++) {
+                    let randomNumber = (Math.floor(Math.random() * 100) - 50) / 10;
+                    elements[i].style.transform = `rotate(${randomNumber}deg) translateX(${1 - randomNumber * 2}px) translateY(${1 - randomNumber * 2}px)`;
+                }
+
+                randomNumber = (Math.floor(Math.random() * 500) - 250) / 10;
+                document.getElementsByTagName("img")[0].style.transform = `rotate(${randomNumber}deg)`;
+
+                document.querySelectorAll("footer p")[0].style.transform = `rotateX(180deg)`;
+            }
+            // else {
+            //     let elements = document.querySelectorAll(".box h1, .box p, .box br, .box hr, .box a");
+
+            //     for (let i = 0; i < elements.length; i++) {
+            //         elements[i].style.transform = `rotate(0deg)`;
+            //     }
+
+            //     document.getElementsByClassName("box")[0].style.transform = `rotate(0deg)`;
+
+            //     document.getElementsByTagName("img")[0].style.transform = `rotate(0deg)`;
+
+            //     document.querySelectorAll("footer p")[0].style.transform = `rotateX(0deg)`;
+            // }
+            // flip = !flip;
+
+        }, 2000);
+
+        setTimeout(() => {
+            let elements = document.querySelectorAll(".box h1, .box h2, .box h3, .box p, .box br, .box hr, .box a, section.box, img");
+
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].classList.add("show");
+            }
+        }, 0);
+        
+    </script>
+
+</body>
+
+</html>
