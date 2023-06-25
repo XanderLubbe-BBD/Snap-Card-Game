@@ -115,7 +115,7 @@ export async function leaveGame(joinCode, playerWS, disconnected = false){
             const result = await deckAPI.addPile(game.deck_id, game.lobby.get(playerWS).currentHand);
             activeGames.get(joinCode).lobby.get(playerWS).currentHand = new Array();
         }
-        activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerWS, disconnected);
+        activeGames.get(joinCode).lobby = removePlayerByWebSocket(game, playerWS, disconnected);
         if (activeGames.get(joinCode).lobby.size === 0) {
             activeGames.delete(joinCode);
         }
@@ -294,22 +294,22 @@ export async function snap(joinCode, playerWS){
     }
 }
 
-function removePlayerByWebSocket(lobby, playerWS, disconnected) {
-    if (lobby.has(playerWS)) {
-        const playerLeft = lobby.get(playerWS)
-        lobby.forEach((value, key) => {
+function removePlayerByWebSocket(game, playerWS, disconnected) {
+    if (game.lobby.has(playerWS)) {
+        const playerLeft = game.lobby.get(playerWS)
+        game.lobby.forEach((value, key) => {
             key.send(JSON.stringify({
                 type: "leave",
                 player: playerLeft.id
             }))
         });
-        lobby.delete(playerWS)
-        if (lobby.started === true && playerLeft.turn === true) {
-            lobby = setNextPlayerTurn(lobby, playerWS)
+        if (game.started === true && playerLeft.turn === true) {
+            game.lobby = setNextPlayerTurn(game.lobby, playerWS)
         }
+        game.lobby.delete(playerWS)
     }
 
-    return lobby
+    return game.lobby
 }
 
 function setNextPlayerTurn(lobby, currentPlayer) {
@@ -341,6 +341,7 @@ function getPlayerIndex(playerArray, currentPlayer, count, size){
 }
 
 async function  setPlayersHand(game, redistribute, randomPlayer = null){
+    let remaining = 0;
     for (let [playerSocket, player] of game.lobby.entries()) {
         if (redistribute === false) {
             let numCard;
@@ -366,6 +367,7 @@ async function  setPlayersHand(game, redistribute, randomPlayer = null){
                 const currentHand = await deckAPI.drawPile(game.deck_id, player.timesPlayed);
 
                 player.currentHand = currentHand.cards;
+                remaining = currentHand.piles.SnapPot.remaining;
             } else {
                 player.currentHand = new Array();
             }
@@ -373,6 +375,52 @@ async function  setPlayersHand(game, redistribute, randomPlayer = null){
         }
     }
 
+    if (remaining > 0) {
+        const pileList = await deckAPI.listPile(game.deck_id);
+        const pileCards = pileList.piles.SnapPot.cards;
+        const numCards = Math.floor(pileCards.length / game.lobby.size);
+        const firstPlayer = Array.from(game.lobby.keys())[0];
+
+        for (let [playerSocket, player] of game.lobby.entries()) {
+            if ((pileCards.length % 2 === 1) && game.lobby.size % 2 === 0) {
+                let currentHand = null
+                if (playerSocket === firstPlayer) {
+                    currentHand = await deckAPI.drawPile(game.deck_id, numCards + 1);
+                } else {
+                    currentHand = await deckAPI.drawPile(game.deck_id, numCards);
+                }
+
+                player.currentHand = player.currentHand.concat(currentHand.cards);
+            } else if ((pileCards.length % 2 === 1) && game.lobby.size === 3) {
+                let currentHand = null;
+                if (pileCards.length == 5) {
+                    currentHand = await deckAPI.drawPile(game.deck_id, numCards + 1);
+                } else {
+                    if (playerSocket === firstPlayer) {
+                        currentHand = await deckAPI.drawPile(game.deck_id, numCards + 1);
+                    } else {
+                        currentHand = await deckAPI.drawPile(game.deck_id, numCards);
+                    }
+                }
+
+                player.currentHand = player.currentHand.concat(currentHand.cards);
+            } else if ((pileCards.length % 2 === 0) && (game.lobby.size  % 2 === 0)) {
+                const currentHand = await deckAPI.drawPile(game.deck_id, numCards);
+
+                player.currentHand = player.currentHand.concat(currentHand.cards);
+            } else if ((pileCards.length % 2 === 0) && game.lobby.size === 3) {
+                let currentHand = null;
+                if (playerSocket === firstPlayer) {
+                    currentHand = await deckAPI.drawPile(game.deck_id, numCards + 1);
+                } else {
+                    currentHand = await deckAPI.drawPile(game.deck_id, numCards);
+                }
+
+                player.currentHand = player.currentHand.concat(currentHand.cards);
+            }
+            player.timesPlayed = 0;
+        }
+    }
     return game.lobby;
 }
 
