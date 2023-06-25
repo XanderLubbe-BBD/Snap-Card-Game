@@ -110,11 +110,12 @@ export async function joinGame(joinCode, playerInfo, playerWS){
 export async function leaveGame(joinCode, playerWS, disconnected = false){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
-        const playerLeft = game.lobby.get(playerWS);
         if (game.started === true) {
-            const result = await deckAPI.addCard(game.deck_id, game.lobby.get(playerWS).currentHand);
+            console.log("Removing cards");
+            const result = await deckAPI.addPile(game.deck_id, game.lobby.get(playerWS).currentHand);
+            activeGames.get(joinCode).lobby.get(playerWS).currentHand = new Array();
         }
-        activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerLeft, disconnected);
+        activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerWS, disconnected);
         if (activeGames.get(joinCode).lobby.size === 0) {
             activeGames.delete(joinCode);
         }
@@ -128,12 +129,11 @@ export async function leaveGame(joinCode, playerWS, disconnected = false){
  * Desc:
  * Distributes cards to pile if  players is disconnected from a game.
  */
-export async function disconnect(playerWS){
-
-    for (const [joinCode, game] of activeGames.entries()) {
-        for (const [player] of game.keys()) {
-            if (playerWS === player) {
-                await leaveGame(joinCode, playerWS, true);
+export async function disconnect(){
+    for (const joinCode of activeGames.keys()) {
+        for (const player of activeGames.get(joinCode).lobby.keys()) {
+            if (player.readyState === 3) {
+                await leaveGame(joinCode, player, true);
             }
         }
         
@@ -205,7 +205,7 @@ export async function playCard(joinCode, playerWS){
         if (game.started === true) {
             const card = game.lobby.get(playerWS).currentHand[0];
 
-            const result = await deckAPI.addPile(game.deck_id, [card.code]);
+            const result = await deckAPI.addPile(game.deck_id, [card]);
 
             activeGames.get(joinCode).lobby.get(playerWS).timesPlayed += 1;
             activeGames.get(joinCode).lobby.get(playerWS).currentHand.shift();
@@ -294,18 +294,18 @@ export async function snap(joinCode, playerWS){
     }
 }
 
-function removePlayerByWebSocket(lobby, wss, disconnected) {
-    if (lobby.has(wss)) {
-        const playerLeft = lobby.get(wss)
+function removePlayerByWebSocket(lobby, playerWS, disconnected) {
+    if (lobby.has(playerWS)) {
+        const playerLeft = lobby.get(playerWS)
         lobby.forEach((value, key) => {
             key.send(JSON.stringify({
-                type: (disconnected === true)?"disconnect":"leave",
+                type: "leave",
                 player: playerLeft.id
             }))
         });
-        lobby.delete(wss)
+        lobby.delete(playerWS)
         if (lobby.started === true && playerLeft.turn === true) {
-            lobby = setNextPlayerTurn(lobby, wss)
+            lobby = setNextPlayerTurn(lobby, playerWS)
         }
     }
 
