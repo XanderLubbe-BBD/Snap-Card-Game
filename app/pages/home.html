@@ -18,11 +18,11 @@
     <main>
         <section class="box">
             <section class="buttons">
-                <a type="button" class="full" href="/game">New Game</a>
-                <a type="button" href="/rules">Rules</a>
-                <a type="button" href="/history">History</a>
+                <a type="button" class="full" href='/game/'>New Game</a>
+                <a type="button" href="/rules/">Rules</a>
+                <a type="button" href="/history/">History</a>
                 <hr />
-                <a type="button" class="outline" href="/">Logout</a>
+                <a id="logoutBtn" type="button" class="outline" href="/">Logout</a>
             </section>
         </section>
     </main>
@@ -30,6 +30,16 @@
     <footer>
         <p>Copyright &copy; 2023 Snapy</p>
     </footer>
+
+    <script>
+        let buttons = document.getElementsByTagName('a');
+        [...buttons].forEach(btn => {
+            if (btn.id != "logoutBtn"){
+                btn.href += sessionStorage.getItem('token');
+            }
+        })
+    </script>
+    <script src="/js/logout.js"></script>
 
 </body>
 

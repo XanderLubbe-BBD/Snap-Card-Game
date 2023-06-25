@@ -72,19 +72,7 @@
         <p>Copyright &copy; 2023 Snapy</p>
     </footer>
 
-    <script>
-        document.getElementById("signinBtn").addEventListener("click", () => {
-            let email = document.getElementById("email").value;
-            let password = document.getElementById("password").value;
-
-            if(email == "user@example.com" && password == "password"){
-                window.location.href = "/home";
-            } else {
-                document.getElementById("error-message").textContent = "Incorrect email address or password";
-                document.getElementById("error-message").style.display = "block";
-            }
-        });
-    </script>
+    <script src="/js/login.js"></script>
 </body>
 
 </html>
