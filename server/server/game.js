@@ -100,17 +100,36 @@ export async function joinGame(joinCode, playerInfo, playerWS){
  * Desc:
  * Allows players to leave a game.
  */
-export async function leaveGame(joinCode, playerWS){
+export async function leaveGame(joinCode, playerWS, disconnected = false){
     if (validatePlayerByWebSocket(joinCode, playerWS)) {
         const game = activeGames.get(joinCode);
+        const playerLeft = game.lobby.get(playerWS);
         if (game.started === true) {
-            const playerLeft = game.lobby.get(playerWS);
             const result = await deckAPI.addCard(game.deck_id, game.lobby.get(playerWS).currentHand);
-            activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerLeft);
         }
+        activeGames.get(joinCode).lobby = removePlayerByWebSocket(game.lobby, playerLeft, disconnected);
         if (activeGames.get(joinCode).lobby.size === 0) {
             activeGames.delete(joinCode);
         }
+    }
+}
+
+/**
+ * 
+ * @param {String} joinCode
+ * @param {WebSocket} playerWS
+ * Desc:
+ * Distributes cards to pile if  players is disconnected from a game.
+ */
+export async function disconnect(playerWS){
+
+    for (const [joinCode, game] of activeGames.entries()) {
+        for (const [player] of game.keys()) {
+            if (playerWS === player) {
+                await leaveGame(joinCode, playerWS, true);
+            }
+        }
+        
     }
 }
 
@@ -128,19 +147,8 @@ export async function startGame(joinCode, playerWS){
 
         if (game.started === false) {
             const randomPlayer = Array.from(game.lobby.keys())[Math.floor(Math.random() * game.lobby.size)];
-            const numCard = Math.floor(52 / game.lobby.size);
 
-            for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
-                let currentHand = null;
-                if (game.lobby.size === 3 && playerSocket === randomPlayer) {
-                    currentHand = await deckAPI.drawDeck(game.deck_id, numCard + 1);
-                } else {
-                    currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
-                }
-
-                player.turn = false;
-                player.currentHand = currentHand.cards;
-            }
+            activeGames.get(joinCode).lobby = await setPlayersHand(game, Array.from(game.lobby.values()).every( player => player.currentHand === []));
 
             activeGames.get(joinCode).lobby.get(randomPlayer).turn = true;
 
@@ -200,10 +208,25 @@ export async function playCard(joinCode, playerWS){
                     player: game.lobby.get(playerWS).id,
                 }))
             })
-                
-            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
+            const redistribute = Array.from(activeGames.get(joinCode).lobby.values()).every( player => player.currentHand === []);
+            if (redistribute === true) {
+                game.lobby = activeGames.get(joinCode).lobby = setPlayersHand(activeGames.get(joinCode), redistribute);
 
-            
+                const lobbyInfo = Array.from(game.lobby.values()).map( values => {
+                    return {"id": values.id, "cards": values.currentHand.length}
+                });
+
+                game.lobby.forEach( (value, key) => {
+                    value.timesPlayed = 0;
+
+                    key.send(JSON.stringify({
+                        type: "redistribute",
+                        players: lobbyInfo
+                    }))
+                });
+            }
+
+            activeGames.get(joinCode).lobby = setNextPlayerTurn(game.lobby, playerWS);
         }
     }
 }
@@ -226,6 +249,9 @@ export async function snap(joinCode, playerWS){
                     const firstCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 1];
                     const secondCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 2];
                     if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
+                        for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
+                            player.timesPlayed = 0;
+                        }
                         if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 52) {
                             game.lobby.forEach( (value, key) => {
                                 key.send(JSON.stringify({
@@ -263,12 +289,12 @@ export async function snap(joinCode, playerWS){
     }
 }
 
-function removePlayerByWebSocket(lobby, wss) {
+function removePlayerByWebSocket(lobby, wss, disconnected) {
     if (lobby.has(wss)) {
         const playerLeft = lobby.get(wss)
         lobby.forEach((value, key) => {
             key.send(JSON.stringify({
-                type: "leave",
+                type: (disconnected === true)?"disconnect":"leave",
                 player: playerLeft.id
             }))
         });
@@ -305,6 +331,32 @@ function setNextPlayerTurn(lobby, currentPlayer) {
 
 function getPlayerIndex(playerArray, currentPlayer, count, size){
     return (playerArray.findIndex(playerws => playerws === currentPlayer) + count) % size
+}
+
+async function setPlayersHand(game, redistribute){
+    for (let [playerSocket, player] of game.lobby.entries()) {
+        if (redistribute === false) {
+            const numCard = Math.floor(52 / game.lobby.size);
+
+            let currentHand = null;
+            if (game.lobby.size === 3 && playerSocket === randomPlayer) {
+                currentHand = await deckAPI.drawDeck(game.deck_id, numCard + 1);
+            } else {
+                currentHand = await deckAPI.drawDeck(game.deck_id, numCard);
+            }
+
+            player.turn = false;
+            player.currentHand = currentHand.cards;
+        } else if (redistribute === true) {
+            if (player.timesPlayed > 0) {
+                const currentHand = await deckAPI.drawPile(game.deck_id, player.timesPlayed);
+
+                player.currentHand = currentHand.cards;
+            }
+        }
+    }
+
+    return game.lobby;
 }
 
 function validatePlayerByWebSocket(joinCode, wss) {

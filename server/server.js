@@ -64,3 +64,7 @@ wss.on('connection', function connection(ws) {
         }
     });
 });
+
+wss.on('close', function disconnect(ws) {
+    GameLogic.disconnect(ws);
+});
