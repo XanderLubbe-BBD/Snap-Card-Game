@@ -163,20 +163,23 @@ export async function startGame(joinCode, playerWS){
                     type: "start",
                     players: lobbyInfo
                 }))
-
-                if (randomPlayer === key) {
-                    key.send(JSON.stringify({
-                        type: "yourTurn",
-                        player: value.id
-                    }))
-                } else {
-                    key.send(JSON.stringify({
-                        type: "playerTurn",
-                        player: activeGames.get(joinCode).lobby.get(randomPlayer).id
-                    }))
-                }
-                
             });
+
+            setTimeout(() =>{
+                activeGames.get(joinCode).lobby.forEach( (value, key) => {
+                    if (randomPlayer === key) {
+                        key.send(JSON.stringify({
+                            type: "yourTurn",
+                            player: value.id
+                        }))
+                    } else {
+                        key.send(JSON.stringify({
+                            type: "playerTurn",
+                            player: activeGames.get(joinCode).lobby.get(randomPlayer).id
+                        }))
+                    }
+                });
+            }, 1200);
         }
     }
 }
