@@ -183,7 +183,6 @@ function addJoinElements() {
 
 function createGame() {
     if (debug) {
-        document.getElementById("debugId").innerText = myId;
         if (myId == "") {
             myId = "player";
         }
@@ -198,7 +197,6 @@ function createGame() {
 
 function joinGame() {
     if (debug) {
-        document.getElementById("debugId").innerText = myId;
         if (myId == "") {
             myId = "player2"
         }

@@ -176,17 +176,17 @@ ws.addEventListener('message', function (event) {
         case "leave":
             let playerId = msg.player;
 
-            let leaveElems = document.getElementsByClassName("whole-card");
+            let leaveElems = document.getElementsByClassName(`p${getPlayerIndex(playerId) + 1}-cards`);
 
             leaveElems = [...leaveElems].filter(element => {
                 return element.getAttribute("data-id") === playerId;
             });
 
             leaveElems.forEach(card => {
-                leaveElems[i].classList.add("in-center");
-                leaveElems[i].classList.remove("highlight");
-                leaveElems[i].style.zIndex = zIndexCount++;
-                leaveElems[i].removeAttribute("data-id");
+                card.classList.add("in-center");
+                card.classList.remove("highlight");
+                // card.style.zIndex = zIndexCount++;
+                card.removeAttribute("data-id");
             });
 
             break;
