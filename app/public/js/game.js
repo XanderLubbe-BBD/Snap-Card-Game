@@ -7,32 +7,39 @@ let numPlayers = "";
 
 const debug = true;
 
-if(debug){
-    let pId = document.createElement("p");
-    pId.style.position = "absolute";
-    pId.style.top = "0";
-    pId.style.right = "0";
-    pId.textContent = myId;
-    pId.style.color = "red";
-    pId.id = "debugId";
-    document.body.appendChild(pId);
+if (debug) {
+    fetch("https://randomuser.me/api/").then((response) => {
+        response.json().then((data) => {
+            myId = data.results[0].name.first;
 
-    let input = document.createElement("input");
-    input.style.position = "absolute";
-    input.style.top = "50px";
-    input.style.right = "0";
-    input.id = "debugInput";
-    document.body.appendChild(input);
-    input.addEventListener("keyup", (e) => {
-        pId.textContent = e.target.value;
-        myId = e.target.value;
+            let pId = document.createElement("p");
+            pId.style.position = "absolute";
+            pId.style.top = "0";
+            pId.style.right = "0";
+            pId.textContent = myId;
+            pId.style.color = "red";
+            pId.id = "debugId";
+            document.body.appendChild(pId);
+
+            let input = document.createElement("input");
+            input.style.position = "absolute";
+            input.style.top = "50px";
+            input.style.right = "0";
+            input.id = "debugInput";
+            input.value = myId;
+            document.body.appendChild(input);
+            input.addEventListener("keyup", (e) => {
+                pId.textContent = e.target.value;
+                myId = e.target.value;
+            });
+
+            let debugMsg = document.createElement("p");
+            debugMsg.style.position = "absolute";
+            debugMsg.style.top = "50px";
+            debugMsg.style.color = "red"
+            debugMsg.textContent = "debug mode enabled";
+        });
     });
-
-    let debugMsg = document.createElement("p");
-    debugMsg.style.position = "absolute";
-    debugMsg.style.top = "50px";
-    debugMsg.style.color = "red"
-    debugMsg.textContent = "debug mode enabled";
 }
 
 let playerIds = [];
@@ -193,13 +200,13 @@ function addJoinElements() {
 }
 
 function createGame() {
-    if(debug){
+    if (debug) {
         document.getElementById("debugId").innerText = myId;
-        if(myId == ""){
+        if (myId == "") {
             myId = "player";
         }
     }
-    
+
     let msg = {
         type: "create",
         id: myId
@@ -208,9 +215,9 @@ function createGame() {
 }
 
 function joinGame() {
-    if(debug){
+    if (debug) {
         document.getElementById("debugId").innerText = myId;
-        if(myId == ""){
+        if (myId == "") {
             myId = "player2"
         }
     }
@@ -230,7 +237,7 @@ function joinGame() {
 
     waitingToJoin = true;
 
-    
+
 }
 
 function startGame(players) {
@@ -253,9 +260,9 @@ function startGame(players) {
             }
         }
 
-        if(totalPlayers == 2){
+        if (totalPlayers == 2) {
             totalPlayers = "two";
-        } else if(totalPlayers == 3){
+        } else if (totalPlayers == 3) {
             totalPlayers = "three";
         } else {
             totalPlayers = "four";
@@ -290,7 +297,7 @@ function startGame(players) {
             document.body.appendChild(article);
 
             article.addEventListener("click", () => {
-                if(myTurn){
+                if (myTurn) {
                     let msg = {
                         type: "place",
                         joinCode: jCode
@@ -308,8 +315,8 @@ function startGame(players) {
         document.body.appendChild(myCountSpot);
 
         // Other players
-        for(let i = 0; i < players.length; i++){
-            
+        for (let i = 0; i < players.length; i++) {
+
             playerIds.push(players[i].id);
             let numCards = players[i].cards;
 
@@ -319,9 +326,9 @@ function startGame(players) {
             let cardback;
             let cardfront;
 
-            for(let j = 0; j < numCards; j++){
+            for (let j = 0; j < numCards; j++) {
                 article = document.createElement("article");
-                article.classList.add(`p${i+1}-cards`);
+                article.classList.add(`p${i + 1}-cards`);
                 article.classList.add("whole-card");
                 article.classList.add(totalPlayers);
                 article.setAttribute("data-id", `${players[i].id}`);
@@ -355,7 +362,7 @@ function startGame(players) {
         });
 
         // TODO: remove debug stuff
-        if(debug){
+        if (debug) {
             let debugBtn = document.createElement("button");
             debugBtn.textContent = "Request Debug";
             debugBtn.style.position = "absolute";
@@ -364,14 +371,14 @@ function startGame(players) {
             document.body.appendChild(debugBtn);
 
             debugBtn.addEventListener("click", () => {
-               let msg = {
-                   type: "debug",
-                   joinCode: jCode
-               };
-               sendMessage(msg);
+                let msg = {
+                    type: "debug",
+                    joinCode: jCode
+                };
+                sendMessage(msg);
             });
         }
-        
+
     }, 1000);
 
 
@@ -394,10 +401,10 @@ function clearPage() {
     window.scrollTo(0, 0);
 }
 
-function clearGamePage(){
+function clearGamePage() {
     let cards = document.getElementsByClassName("whole-card");
     [...cards].forEach(card => {
-       card.remove(); 
+        card.remove();
     });
     document.getElementById("callSnap").remove();
 }
@@ -413,7 +420,7 @@ function createGameButtons() {
 function callSnap() {
     let elements = document.getElementsByClassName("in-center");
 
-    if(elements.length >= 2){
+    if (elements.length >= 2) {
         let msg = {
             type: "snap",
             joinCode: jCode
@@ -435,7 +442,7 @@ function getPlayerIndex(id) {
     }
 }
 
-function preLoadCardImages(){
+function preLoadCardImages() {
     preloads = [
         "/images/cards/back.png",
         "/images/cards/blank.png",
@@ -495,7 +502,7 @@ function preLoadCardImages(){
 
     var tempImg = []
 
-    for(let i = 0; i < preloads.length; i++) {
+    for (let i = 0; i < preloads.length; i++) {
         tempImg[i] = new Image();
         tempImg[i].src = preloads[i];
     }

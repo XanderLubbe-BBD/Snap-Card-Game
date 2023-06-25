@@ -208,15 +208,9 @@ ws.addEventListener('message', function (event) {
                     card.classList.remove("my-cards", "p1-cards", "p2-cards", "p3-cards", "in-center");
                     card.setAttribute("data-id", `${players[i].id}`);
 
-                    card.removeEventListener("click", () => {
-                        if (myTurn) {
-                            let msg = {
-                                type: "place",
-                                joinCode: jCode
-                            }
-                            sendMessage(msg);
-                        }
-                    });
+                    let new_element = card.cloneNode(true);
+                    card.parentNode.replaceChild(new_element, card);
+                    card = new_element;
 
                     if (myId == players[i].id) {
                         card.classList.add("my-cards");
