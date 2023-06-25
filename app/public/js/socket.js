@@ -120,6 +120,12 @@ ws.addEventListener('message', function (event) {
 
             document.getElementsByTagName("main")[0].appendChild(box);
 
+            let leaveMessages = document.getElementsByClassName("leave-message");
+            [...leaveMessages].forEach(msg => {
+               msg.remove(); 
+            });
+
+            document.getElementById("my-count").remove();
 
             break;
         case "youWinPot":
@@ -191,7 +197,7 @@ ws.addEventListener('message', function (event) {
 
             let leftPersonMsg = document.createElement("p");
             leftPersonMsg.textContent = `${playerId} left the game`;
-            leftPersonMsg.classList.add(`p${getPlayerIndex(playerId) + 1}-cards`, `${numPlayers}`);
+            leftPersonMsg.classList.add(`p${getPlayerIndex(playerId) + 1}-cards`, `${numPlayers}`, "leave-message");
             leftPersonMsg.style.width = "100px";
             leftPersonMsg.style.color = "white";
             leftPersonMsg.style.textAlign = "center";
