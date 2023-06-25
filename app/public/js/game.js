@@ -347,6 +347,14 @@ function clearPage() {
     window.scrollTo(0, 0);
 }
 
+function clearGamePage(){
+    let cards = document.getElementsByClassName("whole-card");
+    for(let i = 0; i < cards.length; i++){
+        cards[i].remove();
+    }
+    document.getElementById("callSnap").remove();
+}
+
 function createGameButtons() {
     let snapBtn = document.createElement("button");
     snapBtn.textContent = "Snap!";
