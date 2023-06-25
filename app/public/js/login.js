@@ -34,7 +34,7 @@
         let result = await res.json();
         if(result.token){
             localStorage.setItem('token', result.token);
-            window.location.href = `/home`;
+            window.location.href = `/home/${result.token}`;
         }
     }   
     else {

@@ -105,4 +105,9 @@ app.get("/email", auth, (req, res) => {
   res.status(200).json(response);
 });
 
+app.get("/verify", auth, (req, res) => {
+  let response = {valid : true};
+  res.status(200).json(response);
+});
+
 module.exports = app;

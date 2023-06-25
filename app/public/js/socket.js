@@ -58,11 +58,20 @@ ws.addEventListener('message', function (event) {
         case "gameOver":
             let winner = msg.winner;
 
-            clearPage();
+            clearGamePage();
 
-            setTimeout(() => {
-                alert(`Game over! Winner is ${winner}`);
-            }, 1000);
+            let h1 = document.createElement("h1");
+            h1.textContent = `Game Over!`;
+            let h2 = document.createElement("h2");
+            h1.textContent = `${winner} won!`;
+
+            let box = document.createElement("section");
+            box.classList.add("box");
+
+            box.appendChild(h1);
+            box.appendChild(h2);
+
+            document.body.appendChild(box);
             
             break;
         case "youWinPot":

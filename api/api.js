@@ -1,34 +1,22 @@
-var express = require("express");
-var app = express();
-
-app.get("/names", (req, res, next) => {
-    res.json(
-        {
-            status: "success",
-            names: ["Daelin", "Juan-Roux", "Anne-Mien", "Cameron"]
-        }
-    );
-});
+const express = require("express");
+const app = express();
+const { pool } = require("./database");
 
 app.listen(8082, () => {
     console.log("Server running on port 8082");
 });
 
-app.get("/history/:token")
 
-//use this to get email 
-app.get("/email/:token", (req, res) => {
-    getLoggedInUserEmail(req.params.token, res);
-});
-
-app.get("/history/:token", (req, res) => {
-    const token = req.params.token;
-    verifyEmail(token,res);
-});
-
-function getHistory(playerEmail, res){
-    console.log(playerEmail);
-    const query = `SELECT game_id, game_players.player_id, players.username FROM Game_Players INNER JOIN players ON players.player_id = game_players.player_id WHERE game_id IN (SELECT game_id FROM Game_Players WHERE player_id = (SELECT player_id FROM players WHERE email = ?))`;
+app.get("/history/:token",verifyEmail, (req, res) => {
+    const playerEmail = res.locals.email;
+    try{
+    const query = `SELECT game_id, Game_Players.player_id, Players.username 
+    FROM Game_Players 
+    INNER JOIN Players 
+    ON Players.player_id = Game_Players.player_id 
+    WHERE game_id IN 
+    (SELECT game_id FROM Game_Players 
+        WHERE player_id = (SELECT player_id FROM Players WHERE email = ?))`;
     pool.query(query, [playerEmail], (err, rows, fields) => {
         if (!err) {
             let obj = [];
@@ -55,12 +43,18 @@ function getHistory(playerEmail, res){
             res.status(400).send(fields);
         };
     });
-}
+    }
+    catch{
+        
+    }
+});
 
-async function verifyEmail(token, res){
-    let result = await getAuth("email", token);
-    let email = result.email;
-    getHistory(email, res);
+
+async function verifyEmail(req, res, next){
+    const token = req.params.token;
+    const result = await getAuth("email", token);
+    res.locals.email = result.email;
+    next();
 }
 
 const getAuth = async (url, header) => {
@@ -79,6 +73,3 @@ const getAuth = async (url, header) => {
       console.log(error);
     }
   };
-
-
-
