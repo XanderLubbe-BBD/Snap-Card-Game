@@ -1,14 +1,6 @@
-var express = require("express");
-var app = express();
-
-app.get("/names", (req, res, next) => {
-    res.json(
-        {
-            status: "success",
-            names: ["Daelin", "Juan-Roux", "Anne-Mien", "Cameron"]
-        }
-    );
-});
+const express = require("express");
+const app = express();
+const { pool } = require("./database");
 
 app.listen(8082, () => {
     console.log("Server running on port 8082");
@@ -43,7 +35,6 @@ app.get("/history/:token", verifyEmail, (req, res) => {
             res.status(400).send(fields);
         };
     });
-
 });
 
 async function verifyEmail(req, res, next){
@@ -69,6 +60,3 @@ const getAuth = async (url, header) => {
       console.log(error);
     }
   };
-
-
-
