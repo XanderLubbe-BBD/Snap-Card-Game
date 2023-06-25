@@ -35,10 +35,10 @@ export async function createPile(deck_id){
  */
 export async function addPile(deck_id, playerCards){
     if (playerCards) {
-        const cards = `?cards=${playerCards.shift()}`
+        let cards = `?cards=${playerCards.shift().code}`
         playerCards.map(card => {
             if (card) {
-                cards += `,${card}`
+                cards += `,${card.code}`
             }
         } )
     
