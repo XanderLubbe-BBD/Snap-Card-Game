@@ -1,6 +1,5 @@
 # Snap (Card Game)
 <br>
-<hr>
 
 ## Running locally
 
