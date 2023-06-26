@@ -1,4 +1,4 @@
-import * as deckAPI from '../api/docApi.js';
+import * as deckAPI from './api/docApi.js';
 
 const debugMode = true;
 
