@@ -7,7 +7,7 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/pages/landing.html');
 })
 
-app.get('/login', function (req, res) {
+app.get('/signin', function (req, res) {
     res.sendFile(__dirname + '/pages/login.html');
 })
 
