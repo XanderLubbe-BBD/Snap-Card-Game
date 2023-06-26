@@ -1,7 +1,7 @@
 
   const postAuth = async (url, body) => {
     try {
-      const response = await fetch(`https://xdict95te4.eu-west-1.awsapprunner.com/${url}`, {
+      const response = await fetch(`${process.env.AUTH_URL}/${url}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
