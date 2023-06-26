@@ -1,7 +1,7 @@
 
   const postAuth = async (url, body) => {
     try {
-      const response = await fetch(`${process.env.AUTH_URL}/${url}`, {
+      const response = await fetch(`http://13.246.63.33:4001/${url}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
