@@ -1,4 +1,4 @@
-const ws = new WebSocket(process.env.WS_SERVER);
+const ws = new WebSocket(`${process.env.WS_URL}`);
 ws.addEventListener("open", () => {
     console.log("Connected to server");
 });

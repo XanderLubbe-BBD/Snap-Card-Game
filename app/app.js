@@ -70,7 +70,7 @@ async function verifyUser(req,res,next){
 
 const getAuth = async (url, header) => {
     try {
-      const response = await fetch(`http://localhost:4001/${url}`, {
+      const response = await fetch(`${process.env.AUTH_URL}/${url}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
