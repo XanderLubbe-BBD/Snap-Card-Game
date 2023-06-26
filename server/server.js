@@ -1,24 +1,9 @@
 import { WebSocketServer } from 'ws';
-import * as GameLogic from './server/game.js'
+import * as GameLogic from './src/game.js'
 
 // TODO: implement secure web sockets (required when accessing fron-end through https)
 
 const wss = new WebSocketServer({ port: 8081 });
-
-function sendMessage(msg, client = null) {
-    if (!client) {
-        wss.clients.forEach(function each(client) {
-            if (client.readyState === 1) {
-                client.send(msg);
-            }
-        });
-    } else {
-        if (client.readyState === 1) {
-            client.send(msg);
-        }
-    }
-}
-
 
 wss.on('connection', function connection(ws) {
     ws.on('message', function message(data) {
@@ -52,7 +37,6 @@ wss.on('connection', function connection(ws) {
     });
 
     ws.on('close', function disconnect(ws) {
-        console.log("Fucker left! Bastard...");
         GameLogic.disconnect(ws);
     });
 });
