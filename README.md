@@ -44,7 +44,9 @@ Because our front-end and back-end communicate through web socket messages, I th
 1. Run `npm install` in the "api" directory.
 2. Run `npm install` in the "server" directory.
 3. Run `npm install` in the "app" directory.
-4. Run `npm start` in the "api" directory.
-5. Run `npm start` in the "server" directory.
-6. Run `npm start` in the "app" directory.
-7. Open browser to [http://localhost:8080/](http://localhost:8080/)
+4. Run `npm install` in the "auth-server" directory.
+5. Run `npm start` in the "api" directory.
+6. Run `npm start` in the "server" directory.
+7. Run `npm start` in the "app" directory.
+8. Run `npm start` in the "auth-server" directory.
+9. Open browser to [http://localhost:8080/](http://localhost:8080/)
