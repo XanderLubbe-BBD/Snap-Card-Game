@@ -304,7 +304,7 @@ export async function snap(joinCode, playerWS){
                             for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
                                 player.timesPlayed = 0;
                             }
-                            if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 10) {
+                            if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 52) {
                                 game.lobby.forEach( (value, key) => {
                                     key.send(JSON.stringify({
                                         type: "gameOver",
