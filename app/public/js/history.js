@@ -35,7 +35,7 @@ function createHistoryTable(history) {
   ul.classList.add("name-list");
   for (let i = 0; i < history.players.length; i++) {
     let li = document.createElement("li");
-    li.textContent = history.players[i];
+    li.textContent = history[i].players[i];
     ul.appendChild(li);
   }
 
