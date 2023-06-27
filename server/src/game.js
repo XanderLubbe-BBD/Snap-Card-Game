@@ -35,9 +35,9 @@ export async function createGame(playerWS, token) {
             joinCode = getRandomCode();
         }
 
-        const playerInfo = api.getInfo(token);
+        const playerInfo = await api.getInfo(token);
         
-        if (playerInfo) {
+        if (playerInfo.valid) {
             let lobby = new Map();
             lobby.set(playerWS, new Player(playerInfo.username))
             deckAPI.getDeck().then( (gameDeck) => {
