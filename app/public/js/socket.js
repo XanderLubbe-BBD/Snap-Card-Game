@@ -302,6 +302,9 @@ ws.addEventListener('message', function (event) {
             updateCardAmounts();
 
             break;
+        case "history":
+            console.log(msg.history);
+            break;
         default:
             // stuff
             break;
