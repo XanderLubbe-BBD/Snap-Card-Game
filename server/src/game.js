@@ -37,6 +37,8 @@ export async function createGame(playerWS, token) {
         }
 
         const playerInfo = await api.getInfo(token);
+        console.log(("Place 1"));
+        console.log(playerInfo);
         
         if (playerInfo.valid) {
             let lobby = new Map();
@@ -313,8 +315,10 @@ export async function snap(joinCode, playerWS){
                                     }))
                                 });
 
+                                
+
                                 const finishedGame = {"player": Array.from(game.lobby.values()).map( values => {
-                                    return values.emails
+                                    return values.email
                                 }), "winner": game.lobby.get(playerWS).email};
                                 const result = await api.postHistory(finishedGame);
 

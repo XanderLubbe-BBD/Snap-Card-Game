@@ -117,7 +117,7 @@ ws.addEventListener('message', function (event) {
 
             let backBtn = document.createElement("a");
             backBtn.textContent = "Back to home";
-            backBtn.href = "/home";
+            backBtn.href = `/home/${sessionStorage.getItem("token")}`;
             backBtn.setAttribute("type", "button")
             box.appendChild(backBtn);
 
@@ -304,6 +304,7 @@ ws.addEventListener('message', function (event) {
             break;
         case "history":
             console.log(msg.history);
+            createHistoryTable
             break;
         case "register":
             if(msg.status){
