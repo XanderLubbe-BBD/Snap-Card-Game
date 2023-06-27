@@ -70,7 +70,7 @@ async function verifyUser(req,res,next){
 
 const getAuth = async (url, header) => {
     try {
-      const response = await fetch(`${process.env.AUTH_URL}/${url}`, {
+      const response = await fetch(`https://d2lgqlnck8vz6t.cloudfront.net/${url}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
