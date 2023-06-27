@@ -9,18 +9,20 @@ window.onload = function (event) {
     }
     sendMessage(msg);
   });
+
+  ws.addEventListener('message', function (event) {
+    let msg = JSON.parse(event.data);
+  
+    switch (msg.type) {
+      case "history":
+        console.log(msg.history);
+        createHistoryTable(msg.history);
+        break;
+    }
+  })
 };
 
-ws.addEventListener('message', function (event) {
-  let msg = JSON.parse(event.data);
 
-  switch (msg.type) {
-    case "history":
-      console.log(msg.history);
-      createHistoryTable(msg.history);
-      break;
-  }
-})
 
 function createHistoryTable(history) {
   let place = document.getElementById("historyTable");
