@@ -8,56 +8,105 @@ app.listen(8082, () => {
     console.log("Server running on port 8082");
 });
 
+// app.get("/history/:token", verifyEmail, (req, res, next) => {
+//     const playerEmail = res.locals.email;
+//     try {
+//         const query = `SELECT Players.username, Game_Players.game_id, (SELECT DISTINCT username FROM Players INNER JOIN Games ON Players.player_id = Games.winner_id WHERE player_id = (SELECT DISTINCT winner_id FROM Game_Players WHERE player_id = (SELECT player_id FROM Players WHERE email = ?))) as winner_username
+//         FROM Game_Players
+//         INNER JOIN Players ON Players.player_id = Game_Players.player_id
+//         INNER JOIN Games ON Games.game_id = Game_Players.game_id
+//         WHERE Game_Players.game_id IN (
+//           SELECT game_id
+//           FROM Game_Players
+//           WHERE player_id = (
+//             SELECT player_id
+//             FROM Players
+//             WHERE email = ?
+//           )
+//         );`;
+
+
+
+//         pool.query(query, [playerEmail, playerEmail], (err, rows, fields) => {
+//             if (!err) {
+//                 let obj = [];
+//                 let gameIds = [];
+//                 rows.forEach((row) => {
+//                     if (gameIds.includes(row.game_id)) {
+//                         obj.forEach((item) => {
+//                             if (item.game_id == row.game_id) {
+//                                 item.players.push(row.username);
+//                             }
+//                         });
+//                     } else {
+//                         let newObj = {
+//                             game_id: row.game_id,
+//                             winner: row.winner_username,
+//                             players: [row.username]
+//                         };
+//                         obj.push(newObj);
+//                         gameIds.push(row.game_id);
+//                     }
+//                 });
+
+//                 console.log(obj);
+
+//                 res.status(200).send(obj);
+//             } else {
+//                 console.log(err);
+//                 res.status(400).send(fields);
+//             }
+//         });
+//     } catch (err) {
+//         next(err);
+//     }
+// });
+
 app.get("/history/:token", verifyEmail, (req, res, next) => {
     const playerEmail = res.locals.email;
     try {
-        const query = `SELECT Players.username, Game_Players.game_id, (SELECT DISTINCT username FROM Players INNER JOIN Games ON Players.player_id = Games.winner_id WHERE player_id = (SELECT DISTINCT winner_id FROM Game_Players WHERE player_id = (SELECT player_id FROM Players WHERE email = ?))) as winner_username
+      const query = `SELECT Players.username, Games.game_id, Winners.username AS winner_username
+      FROM Game_Players
+      INNER JOIN Players ON Players.player_id = Game_Players.player_id
+      INNER JOIN Games ON Games.game_id = Game_Players.game_id
+      INNER JOIN Players AS Winners ON Winners.player_id = Games.winner_id
+      WHERE Game_Players.game_id IN (
+        SELECT game_id
         FROM Game_Players
-        INNER JOIN Players ON Players.player_id = Game_Players.player_id
-        INNER JOIN Games ON Games.game_id = Game_Players.game_id
-        WHERE Game_Players.game_id IN (
-          SELECT game_id
-          FROM Game_Players
-          WHERE player_id = (
-            SELECT player_id
-            FROM Players
-            WHERE email = ?
-          )
-        );`;
-
-
-
-        pool.query(query, [playerEmail, playerEmail], (err, rows, fields) => {
-            if (!err) {
-                let obj = [];
-                let gameIds = [];
-                rows.forEach((row) => {
-                    if (gameIds.includes(row.game_id)) {
-                        obj.forEach((item) => {
-                            if (item.game_id == row.game_id) {
-                                item.players.push(row.username);
-                            }
-                        });
-                    } else {
-                        let newObj = {
-                            game_id: row.game_id,
-                            winner: row.winner_username,
-                            players: [row.username]
-                        };
-                        obj.push(newObj);
-                        gameIds.push(row.game_id);
-                    }
-                });
-                res.status(200).send(obj);
-            } else {
-                console.log(err);
-                res.status(400).send(fields);
+        WHERE player_id = (
+          SELECT player_id
+          FROM Players
+          WHERE email = ?
+        )
+      );`;
+  
+   
+  
+      pool.query(query, [playerEmail], (err, rows, fields) => {
+        if (!err) {
+          let games = {};
+          rows.forEach((row) => {
+            const { game_id, username, winner_username } = row;
+            if (!(game_id in games)) {
+              games[game_id] = {
+                game_id: game_id,
+                players: [],
+                winner: winner_username,
+              };
             }
-        });
+            games[game_id].players.push(username);
+          });
+          const result = Object.values(games);
+          res.status(200).send(result);
+        } else {
+          console.log(err);
+          res.status(400).send(fields);
+        }
+      });
     } catch (err) {
-        next(err);
+      next(err);
     }
-});
+  });
 
 app.get("/info/:token", verifyEmail, (req, res) => {
     console.log("Getting info");
