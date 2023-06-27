@@ -128,7 +128,7 @@ const getAuth = async (url, header) => {
 
 
 app.post('/gameResults', (req, res) => {
-    const players = req.body.players;
+    const players = req.body.player;
     const winner = req.body.winner;
 
     console.log(`Winner: ${winner}`);
