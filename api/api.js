@@ -97,7 +97,7 @@ async function verifyAndRetrieveUser(req, res, next){
     const result = await getAuth("user", token);
     res.locals.email = result.email;
     res.locals.firstName = result.firstName;
-    res.local.lastName = result.lastName;
+    res.locals.lastName = result.lastName;
     next();
 }
 
