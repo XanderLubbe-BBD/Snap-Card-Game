@@ -198,6 +198,7 @@ export async function startGame(joinCode, playerWS){
                 activeGames.get(joinCode).started = true;
 
                 const lobbyInfo = getPlayerCardCount(game.lobby);
+                console.log(lobbyInfo);
 
                 activeGames.get(joinCode).lobby.forEach( (value, key) => {
                     key.send(JSON.stringify({
