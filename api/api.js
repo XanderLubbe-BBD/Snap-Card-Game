@@ -50,18 +50,20 @@ app.get("/history/:token",verifyEmail, (req, res) => {
 });
 
 app.get("/info/:token", verifyEmail, (req, res) => {
+    console.log("Getting info");
     const playerEmail = res.locals.email;
+    console.log(`Email: ${playerEmail}`);
     try{
-    const query = `SELECT username FROM Players WHERE email = ?`;
-    pool.query(query, [playerEmail], (err, rows, fields) => {
-        if (!err) {
-            const response = {email: rows.email}
-            res.status(200).send(response);
-        } else {
-            console.log(err);
-            res.status(400).send(fields);
-        };
-    });
+        const query = `SELECT username FROM Players WHERE email = ?`;
+        pool.query(query, [playerEmail], (err, rows, fields) => {
+            if (!err) {
+                const response = {email: rows.email}
+                res.status(200).send(response);
+            } else {
+                console.log(err);
+                res.status(400).send(fields);
+            };
+        });
     }
     catch{
         
