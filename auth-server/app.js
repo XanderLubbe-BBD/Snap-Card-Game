@@ -10,7 +10,7 @@ app.use(express.json());
 
 const cors = require("cors");
 const corsOptions = {
-  origin: [`${process.env.APP_URL}`, `${process.env.API_URL}`, `${process.env.SERVER_URL}`, `http://13.246.63.33:8080`],
+  origin: [`${process.env.APP_URL}`, `${process.env.API_URL}`, `${process.env.SERVER_URL}`],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -115,7 +115,7 @@ app.post("/login", async (req, res) => {
 const auth = require("./middleware/auth");
 
 app.get("/email", auth, (req, res) => {
-  let response = { email: req.user.email };
+  let response = { email: req.user.email, valid: true };
   res.status(200).json(response);
 });
 
@@ -123,5 +123,11 @@ app.get("/verify", auth, (req, res) => {
   let response = { valid: true };
   res.status(200).json(response);
 });
+
+app.get("/user", auth, (req, res) => {
+  let response = { email: req.user.email, firstName: req.user.first_name, lastName: req.user.last_name, valid: true, };
+  res.status(200).json(response);
+});
+
 
 module.exports = app;
