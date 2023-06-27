@@ -13,7 +13,7 @@ Do not checkout `main`.
 Create two mysql databases: one  for the game and one for authentication. <br/>
 Run the following scripts to create the databases:
 
-CREATE SnapHistoryDB;
+CREATE DATABASE SnapHistoryDB;
 
 USE SnapHistoryDB;
 
