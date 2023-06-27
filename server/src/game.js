@@ -1,7 +1,5 @@
 import * as deckAPI from './api/docApi.js';
 
-const debugMode = true;
-
 /**
  * 
  * @param {Object} Player
@@ -26,13 +24,8 @@ const activeGames = new Map();
  * Creates a new active game
  */
 export async function createGame(playerInfo, playerWS){
-    let joinCode;
-    if(debugMode){
-        joinCode = "00000";
-    } else {
-        const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-        joinCode = getRandomCode();
-    }
+    const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
+    const joinCode = getRandomCode();
 
     let lobby = new Map();
     lobby.set(playerWS, new Player(playerInfo))
