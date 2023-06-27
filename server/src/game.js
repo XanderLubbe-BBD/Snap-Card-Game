@@ -9,8 +9,8 @@ const debugMode = false;
  * Desc:
  * Instantiates a player using a destructor
  */
-function Player(email) {
-    this.username = email;
+function Player(username) {
+    this.username = username;
     this.currentHand = null;
     this.turn = false;
     this.timesPlayed = 0;

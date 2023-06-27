@@ -3,24 +3,7 @@ import * as GameLogic from './src/game.js'
 import * as HistoryLogic from './src/history.js'
 
 
-// TODO: implement secure web sockets (required when accessing fron-end through https)
-
 const wss = new WebSocketServer({ port: 8081 });
-
-function sendMessage(msg, client = null) {
-    if (!client) {
-        wss.clients.forEach(function each(client) {
-            if (client.readyState === 1) {
-                client.send(msg);
-            }
-        });
-    } else {
-        if (client.readyState === 1) {
-            client.send(msg);
-        }
-    }
-}
-
 
 wss.on('connection', function connection(ws) {
     ws.on('message', function message(data) {
