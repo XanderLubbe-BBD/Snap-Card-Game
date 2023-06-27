@@ -98,6 +98,7 @@ async function verifyAndRetrieveUser(req, res, next){
     res.locals.email = result.email;
     res.locals.firstName = result.firstName;
     res.locals.lastName = result.lastName;
+    console.log(result);
     next();
 }
 
