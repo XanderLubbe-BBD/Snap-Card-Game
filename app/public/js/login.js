@@ -1,7 +1,7 @@
 
   const postAuth = async (url, body) => {
     try {
-      const response = await fetch(`http://13.246.63.33:4001/${url}`, {
+      const response = await fetch(`https://d2lgqlnck8vz6t.cloudfront.net/${url}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
