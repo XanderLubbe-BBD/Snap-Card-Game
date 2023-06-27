@@ -159,7 +159,7 @@ function addJoinElements() {
 function createGame() {
     let msg = {
         type: "create",
-        id: sessionStorage.getItem("token")
+        token: sessionStorage.getItem("token")
     }
     sendMessage(msg);
 }
@@ -175,7 +175,7 @@ function joinGame() {
     let msg = {
         type: "join",
         joinCode: jCode,
-        id: sessionStorage.getItem("token")
+        token: sessionStorage.getItem("token")
     }
     sendMessage(msg);
 
