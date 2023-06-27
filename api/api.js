@@ -11,13 +11,13 @@ app.listen(8082, () => {
 app.get("/history/:token", verifyEmail, (req, res, next) => {
     const playerEmail = res.locals.email;
     try {
-        const query = `SELECT Players.username, Game_Players.game_id, (SELECT DISTINCT username FROM .Players INNER JOIN .Games ON Players.player_id = Games.winner_id WHERE player_id = (SELECT DISTINCT winner_id FROM .Game_Players WHERE player_id = (SELECT player_id FROM .Players WHERE email = ?))) as Winner
+        const query = `SELECT Players.username, Game_Players.game_id, (SELECT DISTINCT username FROM Players INNER JOIN Games ON Players.player_id = Games.winner_id WHERE player_id = (SELECT DISTINCT winner_id FROM Game_Players WHERE player_id = (SELECT player_id FROM Players WHERE email = ?))) as Winner
         FROM .Game_Players
-        INNER JOIN .Players ON Players.player_id = Game_Players.player_id
-        INNER JOIN .Games ON Games.game_id = Game_Players.game_id
+        INNER JOIN Players ON Players.player_id = Game_Players.player_id
+        INNER JOIN Games ON Games.game_id = Game_Players.game_id
         WHERE Game_Players.game_id IN (
           SELECT game_id
-          FROM .Game_Players
+          FROM Game_Players
           WHERE player_id = (
             SELECT player_id
             FROM Players
