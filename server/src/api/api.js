@@ -3,6 +3,9 @@ import {config} from '../../config/config.js';
 export async function postHistory(game) {
     const response = await fetch(`http://apiserver:8082/gameResults`,{
         method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(game)
       })
       
