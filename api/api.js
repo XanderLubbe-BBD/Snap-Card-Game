@@ -1,16 +1,17 @@
 const express = require("express");
 const app = express();
 const { pool } = require("./database");
+const bodyParser = require('body-parser');
 
+app.use(bodyParser.json());
 app.listen(8082, () => {
     console.log("Server running on port 8082");
 });
 
-
-app.get("/history/:token",verifyEmail, (req, res) => {
+app.get("/history/:token",verifyEmail, (req, res, next) => {
     const playerEmail = res.locals.email;
     try{
-    const query = `SELECT game_id, Game_Players.player_id, Players.username 
+    const query = `SELECT Players.username 
     FROM Game_Players 
     INNER JOIN Players 
     ON Players.player_id = Game_Players.player_id 
@@ -44,8 +45,8 @@ app.get("/history/:token",verifyEmail, (req, res) => {
         };
     });
     }
-    catch{
-        
+    catch (err) {
+        next(err)
     }
 });
 
@@ -123,6 +124,49 @@ const getAuth = async (url, header) => {
       return json;
     } catch (error) {
       console.log(error);
-    }
-  };
+    }};
 
+
+app.post('/gameResults', (req, res) => {
+    const players = req.body.players;
+    const winner = req.body.winner;
+
+    if (players.length < 2) {
+        res.status(400).json({ error: 'At least 2 players are required.' });
+        return;
+    }
+  
+    const gameQuery = 'INSERT INTO Games (winner_id) VALUES (?)';
+    pool.query(gameQuery, [winner], (error, results) => {
+        if (error) {
+            console.error('Error inserting game:', error);
+            res.sendStatus(500);
+            return;
+        }
+  
+        const gameId = results.insertId;
+    
+        let placeholders = '';
+        const values = [];
+    
+        for (let i = 0; i < players.length; i++) {
+            placeholders += '(?, ?), ';
+            values.push(gameId, players[i]);
+        }
+    
+        placeholders = placeholders.slice(0, -2);
+    
+        const gamePlayersQuery =
+            `INSERT INTO Game_Players (game_id, player_id) VALUES ${placeholders}`;
+        
+        pool.query(gamePlayersQuery, values, (error) => {
+            if (error) {
+            console.error('Error inserting game players:', error);
+            res.sendStatus(500);
+            return;
+            }
+    
+                res.sendStatus(200);
+        });
+    });
+});
