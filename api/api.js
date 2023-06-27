@@ -168,7 +168,7 @@ app.post('/gameResults', (req, res) => {
             return;
             }
     
-                res.sendStatus(200);
+                res.status(200).send({success: true});
         });
     });
 });
