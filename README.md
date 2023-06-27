@@ -77,7 +77,7 @@ HOST: your mysql hostname <br/>
 USER: your mysql username<br/>
 PASSWORD: your mysql password<br/>
 DATABASE: database for authentication <br/>
-TOKEN_KEY = enter any string without quotations here<br/>
+TOKEN_KEY = enter any combination of letters here (no spaces or quotations)<br/>
 API_PORT=4001 <br/>
 APP_URL= http://localhost:8080 <br/>
 API_URL= http://localhost:8082 <br/>
