@@ -17,7 +17,7 @@ export async function getHistory(token) {
 }
 
 export async function getInfo(token) {
-  const response = await fetch(`${process.env.API_URL}/info/${token}`,{
+  const response = await fetch(`http://apiserver:8082/info/${token}`,{
       method: 'GET',
     })
     
