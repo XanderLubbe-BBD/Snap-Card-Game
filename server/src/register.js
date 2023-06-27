@@ -4,8 +4,8 @@ import * as api from './api/api.js';
 export async function registerUser(ws, token){
     try {
         const result = await api.sendInfo(token);
-        console.log(result);
-        if(result.status == "success"){
+
+        if(result){
             ws.send(JSON.stringify({
                 type: "register",
                 status: true
