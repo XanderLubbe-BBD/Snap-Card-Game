@@ -1,4 +1,4 @@
-const ws = new WebSocket(`ws://ec2-13-246-63-33.af-south-1.compute.amazonaws.com:8081`);
+const ws = new WebSocket(`wss://d2lgqlnck8vz6t.cloudfront.net/socket`);
 ws.addEventListener("open", () => {
     console.log("Connected to server");
 });
