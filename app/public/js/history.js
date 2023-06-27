@@ -39,7 +39,7 @@ function createHistoryTable(history) {
       let li = document.createElement("li");
       li.textContent = history[j].players[i];
       if(winner == history[j].players[i]){
-        li.classList("winner");
+        li.classList.add("winner");
       }
       ul.appendChild(li);
     }
