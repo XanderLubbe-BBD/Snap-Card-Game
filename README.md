@@ -5,7 +5,7 @@
 
 ### 1. Checkout the correct branch
 
-Checkout the branch called `local`. 
+Checkout the branch called `local`. <br/>
 Do not checkout `main`.
 
 ### 2. Creating the databases
