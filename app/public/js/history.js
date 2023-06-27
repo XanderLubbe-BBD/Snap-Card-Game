@@ -41,3 +41,7 @@ function createHistoryTable(history) {
   tr.appendChild(td);
   place.appendChild(tr);
 }
+
+function sendMessage(data) {
+  ws.send(JSON.stringify(data));
+}
