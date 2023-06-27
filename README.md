@@ -13,6 +13,47 @@ Do not checkout `main`.
 Create two mysql databases: one  for the game and one for authentication. <br/>
 Run the following scripts to create the databases:
 
+USE SnapHistoryDB;
+
+-- Create the Players table
+CREATE TABLE Players (
+  player_id INT NOT NULL AUTO_INCREMENT,
+  username VARCHAR(255),
+  email VARCHAR(255),
+  PRIMARY KEY (player_id)
+);
+
+-- Create the Games table
+CREATE TABLE Games (
+  game_id INT NOT NULL AUTO_INCREMENT,
+  winner_id INT,
+  PRIMARY KEY (game_id),
+  FOREIGN KEY (winner_id) REFERENCES Players(player_id)
+);
+
+-- Create the Game_Players table
+CREATE TABLE Game_Players (
+  gamePlayersId INT NOT NULL AUTO_INCREMENT,
+  game_id INT,
+  player_id INT,
+  PRIMARY KEY(gamePlayersId),
+  FOREIGN KEY (game_id) REFERENCES Games(game_id),
+  FOREIGN KEY (player_id) REFERENCES Players(player_id)
+);
+
+CREATE DATABASE AuthServerDB;
+
+USE AuthServerDB;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) DEFAULT NULL,
+    last_name VARCHAR(255) DEFAULT NULL,
+    email VARCHAR(255) UNIQUE,
+    password VARCHAR(255),
+    token VARCHAR(255)
+);
+
 ### 3. Adding environment variables
 
 Add an `.env` file in the `api` folder containing the following: <br/> 
