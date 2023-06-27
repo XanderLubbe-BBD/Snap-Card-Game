@@ -41,8 +41,8 @@ app.get("/history/:token", verifyEmail, (req, res, next) => {
                     } else {
                         let newObj = {
                             game_id: row.game_id,
-                            players: [row.username],
                             winner: row.winner_username,
+                            players: [row.username]
                         };
                         obj.push(newObj);
                         gameIds.push(row.game_id);
