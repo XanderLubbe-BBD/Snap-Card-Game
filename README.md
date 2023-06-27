@@ -3,29 +3,35 @@
 
 ## Running locally
 
-Add an `.env` file in the api folder containing the following: <br/> <br/>
+### 1. Creating the databases
 
-HOST: <br/>
-USER: <br/>
-PASSWORD: <br/>
-DATABASE: database for game <br/>
+Create two mysql databases: one  for the game and one for authentication. <br/>
+Run the following scripts to create the databases:
 
-AUTH_URL= http://localhost:4001 <br/> <br/>
+### 2. Adding environment variables
+
+Add an `.env` file in the `api` folder containing the following: <br/> 
+
+  HOST: your mysql hostname<br/>
+  USER: your mysql username<br/>
+  PASSWORD: your mysql password<br/>
+  DATABASE: database for game <br/>
+  AUTH_URL= http://localhost:4001 <br/> <br/>
 
 
-Add an `.env` file in the auth-server folder containing the following: <br/>
+Add an `.env` file in the `auth-server` folder containing the following: <br/>
 
-HOST: <br/>
-USER: <br/>
-DATABASE: <br/>
-PASSWORD: <br/>
-
-TOKEN_KEY = <br/>
+HOST: your mysql hostname <br/>
+USER: your mysql username<br/>
+PASSWORD: your mysql password<br/>
+DATABASE: database for authentication <br/>
+TOKEN_KEY = enter any string without quotations here<br/>
 API_PORT=4001 <br/>
 APP_URL= http://localhost:8080 <br/>
 API_URL= http://localhost:8082 <br/>
 SERVER_URL= http://localhost:8081 <br/>
 
+### 3. Installing dependencies
 
 1. Run `npm install` in the "api" directory.
 2. Run `npm install` in the "server" directory.
@@ -39,38 +45,6 @@ SERVER_URL= http://localhost:8081 <br/>
 
 <hr>
 
-## Game Info for Development
-
-*This is just a rough idea of how I wanted this project to work. Feel free to add or change anything that doesn't make sense ☺️*
-
-### Game Idea
-
-This is a multi-player game (2 - 4 players). This app uses web sockets to allow players to join a game.
-
-Once a game is started, a shuffled deck of cards is retrieved from the api and split between the players (this can be done by us on the server side or can be handled by the api, they have implemented "piles" to allow us to use the api to keep track of that).
-
-One by one, the server will tell each player when it's their turn and they will be able to click or tap their deck to flip over the top card.
-
-At any stage, any player can click or tap the "snap" button (or press a pre-defined key on the keyboard like spacebar) when the card that is flipped over matches the previous card. If the cards do match, the player to pressed "snap" first will get all the cards from the center added to the bottom of their "pile". If a player presses snap and the cards do not match, they will lose their next card (reducing the number of cards they have).
-
-When a player runs out of cards, they can continue to play, but will not be able to place any cards down. They will need to try to press snap when the cards match to try and get more cards.
-
-The game ends when only 1 player is left with any cards.
-
-### The Various Parts
-
-#### Server
-The server will control the gameplay and manage communication between the players (clients).
-
-#### App
-The app is the front-end that the players will see on their browser. This is where they will see the cards and interact with the game. The app communicated with the server through web sockets.
-
-#### API
-The api is responsible for communicating with the database for registering users and storing scores and results. When a user is created, an api key will be generated for them which will then be used for all api calls to ensure only registed users can hit our endpoints.
-
-#### Other info
-Because our front-end and back-end communicate through web socket messages, I think it's best to have a common structure for the messages. I've created a `sample_websocket_messages.js` file which has the types of messages that will be sent between the front-end and back-end. As we go, we can just keep updating that so that everyone working on different parts can see the structure of the messages they need to send and can expect to receive.
-<br><br><br><br><br><br><br><br>
 
 
 
