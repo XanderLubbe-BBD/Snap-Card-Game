@@ -1,4 +1,4 @@
-const ws = new WebSocket(`${process.env.WS_URL}`);
+const ws = new WebSocket(`ws://ec2-13-246-63-33.af-south-1.compute.amazonaws.com:8081`);
 ws.addEventListener("open", () => {
     console.log("Connected to server");
 });
