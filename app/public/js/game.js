@@ -302,24 +302,6 @@ function startGame(players) {
             callSnap();
         });
 
-        // TODO: remove debug stuff
-        if (debug) {
-            let debugBtn = document.createElement("button");
-            debugBtn.textContent = "Request Debug";
-            debugBtn.style.position = "absolute";
-            debugBtn.style.top = "10px";
-            debugBtn.style.left = "10px";
-            document.body.appendChild(debugBtn);
-
-            debugBtn.addEventListener("click", () => {
-                let msg = {
-                    type: "debug",
-                    joinCode: jCode
-                };
-                sendMessage(msg);
-            });
-        }
-
     }, 1000);
 
 
