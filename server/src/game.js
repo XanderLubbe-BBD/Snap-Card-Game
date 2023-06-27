@@ -81,12 +81,17 @@ export async function joinGame(joinCode, playerWS, token){
 
     try {
         if (activeGames.has(joinCode)) {
+            console.log("Code exists")
             let lobby = activeGames.get(joinCode).lobby
             if (!lobby.has(playerWS)) {
+                console.log("Player is not yet in game");
                 if (lobby.size < 4) {
-                    
+                    console.log("Game has enough space for player to join");
                     const playerInfo = api.getInfo(token);
+                    console.log("Retrieving payer info");
+                    console.log(playerInfo);
                     if (playerInfo.username) {
+                        console.log("Player exists");
                         activeGames.get(joinCode).lobby.set(playerWS, new Player(playerInfo.username))
     
                         activeGames.get(joinCode).lobby.forEach((value, key) => {
