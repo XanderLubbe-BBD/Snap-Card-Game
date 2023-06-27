@@ -1,7 +1,7 @@
 import {config} from '../../config/config.js';
 
 export async function postHistory(game) {
-    const response = await fetch(`${config.base_url}/gameResults`,{
+    const response = await fetch(`http://apiserver:8082/gameResults`,{
         method: 'POST',
         body: JSON.stringify(game)
       })
@@ -10,7 +10,7 @@ export async function postHistory(game) {
 }
 
 export async function getHistory(token) {
-    const response = await fetch(`${config.base_url}/history/${token}`,{
+    const response = await fetch(`http://apiserver:8082/history/${token}`,{
         method: 'GET',
       })
       
