@@ -52,7 +52,7 @@ app.post("/register", async (req, res) => {
         const user_id = results.insertId;
 
         const token = jwt.sign(
-          { user_id, email },
+          { user_id, email, first_name, last_name },
           process.env.TOKEN_KEY,
           {
             expiresIn: "2h",
