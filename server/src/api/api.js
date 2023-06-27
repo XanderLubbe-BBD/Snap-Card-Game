@@ -23,3 +23,11 @@ export async function getInfo(token) {
     
   return response.json()
 }
+
+export async function sendInfo(token) {
+  const response = await fetch(`http://apiserver:8082/register/${token}`,{
+      method: 'GET',
+    })
+    
+  return response.json()
+}

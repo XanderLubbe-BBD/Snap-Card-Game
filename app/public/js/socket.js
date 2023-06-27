@@ -305,6 +305,12 @@ ws.addEventListener('message', function (event) {
         case "history":
             console.log(msg.history);
             break;
+        case "register":
+            if(msg.status){
+                window.location.href = `/home/${sessionStorage.getItem("token")}`;
+            } else {
+                console.log("Error creating player entry is db");
+            }
         default:
             // stuff
             break;

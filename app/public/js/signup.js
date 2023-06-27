@@ -33,7 +33,12 @@ const postAuth = async (url, body) => {
         let result = await res.json();
         if(result.token){
             sessionStorage.setItem('token', result.token);
-            window.location.href = `/home/${result.token}`;
+
+            let msg = {
+                type: "register",
+                token: result.token
+            }
+            sendMessage(msg);
         }
     }   
   }

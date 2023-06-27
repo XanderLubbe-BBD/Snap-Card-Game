@@ -1,6 +1,7 @@
 import { WebSocketServer } from 'ws';
 import * as GameLogic from './src/game.js'
 import * as HistoryLogic from './src/history.js'
+import * as RegisterLogic from './src/register.js'
 
 
 const wss = new WebSocketServer({ port: 8081 });
@@ -33,6 +34,8 @@ wss.on('connection', function connection(ws) {
             case "history":
                 HistoryLogic.getHistory(ws, data.token);
                 break;
+            case "register":
+                RegisterLogic.registerUser(ws, data.token);
             case "debug":
                 GameLogic.debug(data.joinCode, ws);
                 break;
