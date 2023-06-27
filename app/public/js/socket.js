@@ -27,6 +27,10 @@ ws.addEventListener('message', function (event) {
             }
 
             break;
+        case "joinSuccess":
+            myId = msg.player;
+            
+            break;
         case "start":
             startGame(msg.players);
             break;
