@@ -1,5 +1,5 @@
 import * as deckAPI from './api/docApi.js';
-import * as authAPI from './api/authApi.js';
+import * as api from './api/api.js';
 
 const debugMode = false;
 
@@ -10,7 +10,7 @@ const debugMode = false;
  * Instantiates a player using a destructor
  */
 function Player(email) {
-    this.email = email;
+    this.username = email;
     this.currentHand = null;
     this.turn = false;
     this.timesPlayed = 0;
@@ -35,45 +35,34 @@ export async function createGame(playerWS, token) {
             joinCode = getRandomCode();
         }
 
-        const verify = authAPI.verifyToken(token);
-
-        if (verify.isValid) {
+        const playerInfo = api.getInfo(token);
+        
+        if (playerInfo) {
+            let lobby = new Map();
+            lobby.set(playerWS, new Player(playerInfo.username))
+            deckAPI.getDeck().then( (gameDeck) => {
+                const game = {
+                    lobby: lobby,
+                    deck_id: gameDeck.deck_id,
+                    started: false,
+                    snapCalled: false,
+                    pile: null,
+                };
             
-            const playerInfo = authAPI.getInfo(token);
-            
-            if (playerInfo) {
-
-                let lobby = new Map();
-                lobby.set(playerWS, new Player(playerInfo.email))
-                deckAPI.getDeck().then( (gameDeck) => {
-                    const game = {
-                        lobby: lobby,
-                        deck_id: gameDeck.deck_id,
-                        started: false,
-                        snapCalled: false,
-                        pile: null,
-                    };
-                
-                    activeGames.set(joinCode, game);
-                    console.log({
-                        type: "response",
-                        joinCode: joinCode,
-                        message: `Created game successfully`
-                    });
-                
-                    playerWS.send(JSON.stringify({
-                        type: "create",
-                        joinCode: joinCode,
-                        player: playerInfo.email
-                    }));
+                activeGames.set(joinCode, game);
+                console.log({
+                    type: "response",
+                    joinCode: joinCode,
+                    message: `Created game successfully`
                 });
-            }
-        } else {
-            playerWS.send(JSON.stringify({
-                type: "error",
-                message: verify.message
-            }));
-        }    
+            
+                playerWS.send(JSON.stringify({
+                    type: "create",
+                    joinCode: joinCode,
+                    player: playerInfo.username
+                }));
+            });
+        }
     } catch (error) {
         console.log(error);
     }
@@ -91,45 +80,39 @@ export async function createGame(playerWS, token) {
 export async function joinGame(joinCode, playerWS, token){
 
     try {
-        const verify = authAPI.verifyToken(token);
-
-        if (verify.isValid) {
-            if (activeGames.has(joinCode)) {
-                let lobby = activeGames.get(joinCode).lobby
-                if (!lobby.has(playerWS)) {
-                    if (lobby.size < 4) {
-                        
-                        const playerInfo = authAPI.getInfo(token);
-
-                        if (playerInfo.email) {
-                            activeGames.get(joinCode).lobby.set(playerWS, new Player(email))
-        
-                            activeGames.get(joinCode).lobby.forEach((value, key) => {
-                                key.send(JSON.stringify({
-                                    type: "join",
-                                    player: playerInfo.email
-                                }))
-                            });  
-                        }
-                    } else {
+        if (activeGames.has(joinCode)) {
+            let lobby = activeGames.get(joinCode).lobby
+            if (!lobby.has(playerWS)) {
+                if (lobby.size < 4) {
+                    
+                    const playerInfo = api.getInfo(token);
+                    if (playerInfo.username) {
+                        activeGames.get(joinCode).lobby.set(playerWS, new Player(email))
+    
+                        activeGames.get(joinCode).lobby.forEach((value, key) => {
+                            key.send(JSON.stringify({
+                                type: "join",
+                                player: playerInfo.username
+                            }))
+                        });  
                         playerWS.send(JSON.stringify({
-                            type: "error",
-                            message: `Game is full!`
+                            type: "joinSuccess",
+                            player: playerInfo.username
                         }));
                     }
-                    
                 } else {
                     playerWS.send(JSON.stringify({
                         type: "error",
-                        message: `Already part of game!`
+                        message: `Game is full!`
                     }));
                 }
+                
+            } else {
+                playerWS.send(JSON.stringify({
+                    type: "error",
+                    message: `Already part of game!`
+                }));
             }
-        } else {
-            playerWS.send(JSON.stringify({
-                type: "error",
-                message: verify.message
-            }));
         }
     } catch (error) {
         console.log(error);
@@ -223,12 +206,12 @@ export async function startGame(joinCode, playerWS){
                         if (randomPlayer === key) {
                             key.send(JSON.stringify({
                                 type: "yourTurn",
-                                player: value.email
+                                player: value.username
                             }))
                         } else {
                             key.send(JSON.stringify({
                                 type: "playerTurn",
-                                player: activeGames.get(joinCode).lobby.get(randomPlayer).email
+                                player: activeGames.get(joinCode).lobby.get(randomPlayer).username
                             }))
                         }
                     });
@@ -266,7 +249,7 @@ export async function playCard(joinCode, playerWS){
                     key.send(JSON.stringify({
                         type: "placed",
                         card: card,
-                        player: game.lobby.get(playerWS).email,
+                        player: game.lobby.get(playerWS).username,
                     }))
                 })
                 const redistribute = Array.from(activeGames.get(joinCode).lobby.values()).every( player => player.currentHand.length <= 0);
@@ -319,7 +302,7 @@ export async function snap(joinCode, playerWS){
                                 game.lobby.forEach( (value, key) => {
                                     key.send(JSON.stringify({
                                         type: "gameOver",
-                                        winner: game.lobby.get(playerWS).email,
+                                        winner: game.lobby.get(playerWS).username,
                                     }))
                                 });
                             } else {
@@ -338,7 +321,7 @@ export async function snap(joinCode, playerWS){
                                         } else {
                                             key.send(JSON.stringify({
                                                 type: "potWon",
-                                                player: game.lobby.get(playerWS).email,
+                                                player: game.lobby.get(playerWS).username,
                                             }))
                                         }
                                         
@@ -362,7 +345,7 @@ function removePlayerByWebSocket(game, playerWS) {
             game.lobby.forEach((value, key) => {
                 key.send(JSON.stringify({
                     type: "leave",
-                    player: playerLeft.email
+                    player: playerLeft.username
                 }))
             });
             if (game.started === true && playerLeft.turn === true) {
@@ -393,7 +376,7 @@ function setNextPlayerTurn(lobby, currentPlayer) {
             lobby.forEach( (value, key) => {
                 key.send(JSON.stringify({
                     type: (playersWS[playerIndex] === key)?"yourTurn":"playerTurn",
-                    player: lobby.get(playersWS[playerIndex]).email,
+                    player: lobby.get(playersWS[playerIndex]).username,
                 }))
             });
         }
@@ -506,7 +489,7 @@ function validatePlayerByWebSocket(joinCode, wss) {
 
 function getPlayerCardCount(lobby){
     const result = Array.from(lobby.values()).map( async values => {
-        return {"email": values.email, "cards": values.currentHand ? values.currentHand.length : 0}
+        return {"email": values.username, "cards": values.currentHand ? values.currentHand.length : 0}
     });
 
     return result;
@@ -521,7 +504,7 @@ export async function debug(joinCode, playerWS){
 
         game.lobby.forEach((value, key) => {
             players.push({
-                id: value.email,
+                id: value.username,
                 cards: value.currentHand.length
             });
         })
