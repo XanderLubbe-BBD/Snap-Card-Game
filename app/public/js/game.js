@@ -5,25 +5,6 @@ let myId = "";
 let waitingToJoin = false;
 let numPlayers = "";
 
-const debug = false;
-
-if (debug) {
-    fetch("https://randomuser.me/api/").then((response) => {
-        response.json().then((data) => {
-            myId = data.results[0].name.first;
-
-            let pId = document.createElement("p");
-            pId.style.position = "absolute";
-            pId.style.top = "0";
-            pId.style.right = "0";
-            pId.textContent = myId;
-            pId.style.color = "red";
-            pId.id = "debugId";
-            document.body.appendChild(pId);
-        });
-    });
-}
-
 let playerIds = [];
 
 let urlParams = new URLSearchParams(window.location.search);
@@ -96,12 +77,6 @@ function addCreateElements() {
 }
 
 function addJoinElements() {
-    // let code = document.createElement("input");
-    // code.type = "text";
-    // code.id = "code";
-    // code.classList.add("code");
-    // document.getElementsByClassName("buttons")[0].appendChild(code);
-
     let form = document.createElement('form');
     form.method = "get";
     form.id = "digit-group";
@@ -182,25 +157,14 @@ function addJoinElements() {
 }
 
 function createGame() {
-    if (debug) {
-        if (myId == "") {
-            myId = "player";
-        }
-    }
-
     let msg = {
         type: "create",
-        id: myId
+        token: sessionStorage.getItem("token")
     }
     sendMessage(msg);
 }
 
 function joinGame() {
-    if (debug) {
-        if (myId == "") {
-            myId = "player2"
-        }
-    }
     jCode = "";
 
     let digits = document.getElementsByClassName("singleInput");
@@ -211,7 +175,7 @@ function joinGame() {
     let msg = {
         type: "join",
         joinCode: jCode,
-        id: myId
+        token: sessionStorage.getItem("token")
     }
     sendMessage(msg);
 
@@ -253,7 +217,6 @@ function startGame(players) {
         players = players.filter(player => {
             return player.id != myId;
         });
-        console.log(`Creating ${myCards} cards for myself`);
 
         // add my cards
         for (let i = 0; i < myCards; i++) {
@@ -299,8 +262,6 @@ function startGame(players) {
 
             playerIds.push(players[i].id);
             let numCards = players[i].cards;
-
-            console.log(`Creating ${numCards} cards for ${players[i].id}`);
 
             let article;
             let cardback;

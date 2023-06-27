@@ -1,11 +1,10 @@
-const ws = new WebSocket("ws://localhost:8081");
+const ws = new WebSocket(`wss://d2lgqlnck8vz6t.cloudfront.net/socket`);
 ws.addEventListener("open", () => {
-    console.log("We are connected");
+    console.log("Connected to server");
 });
 
 ws.addEventListener('message', function (event) {
     let msg = JSON.parse(event.data);
-    console.log(msg);
 
     switch (msg.type) {
         case "create":
@@ -27,6 +26,10 @@ ws.addEventListener('message', function (event) {
                 }
             }
 
+            break;
+        case "joinSuccess":
+            myId = msg.player;
+            
             break;
         case "start":
             startGame(msg.players);
@@ -229,7 +232,6 @@ ws.addEventListener('message', function (event) {
             players = players.filter(player => {
                 return player.id != myId;
             });
-            console.log(`Creating ${myCards} cards for myself`);
 
             // add my cards
             for (let i = 0; i < myCards; i++) {
@@ -271,8 +273,6 @@ ws.addEventListener('message', function (event) {
                 playerIds.push(players[i].id);
                 let numCards = players[i].cards;
 
-                console.log(`Creating ${numCards} cards for ${players[i].id}`);
-
                 let article;
                 let cardback;
                 let cardfront;
@@ -302,8 +302,6 @@ ws.addEventListener('message', function (event) {
             updateCardAmounts();
 
             break;
-        case "debug":
-            checkCardSync(msg.players);
         default:
             // stuff
             break;
@@ -312,29 +310,6 @@ ws.addEventListener('message', function (event) {
 
 function sendMessage(data) {
     ws.send(JSON.stringify(data));
-}
-
-function checkCardSync(players) {
-    console.log("[INFO] Comparing number of cards on front-end and back-end...");
-
-    let checkArr = [];
-
-    for (let i = 0; i < players.length; i++) {
-        let playerId = players[i].id;
-        let playerCards = players[i].cards;
-
-        let elements = document.getElementsByClassName("whole-card");
-        elements = [...elements].filter(element => {
-            return element.getAttribute("data-id") === playerId;
-        });
-
-        console.log(`[INFO] Player "${playerId}" has ${playerCards} cards on the server (Front-end: ${elements.length})`);
-
-        checkArr.push(playerCards == elements.length);
-    }
-
-
-    console.log(`${checkArr.every(element => element) ? "[SUCCESS]" : "[ERROR]"} Sync check ${checkArr.every(element => element) ? "passed" : "failed"}`);
 }
 
 function updateCardAmounts() {

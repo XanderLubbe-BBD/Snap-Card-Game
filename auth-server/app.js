@@ -10,7 +10,7 @@ app.use(express.json());
 
 const cors = require("cors");
 const corsOptions = {
-  origin: ["http://localhost:8080", "http://localhost:8080"],
+  origin: [`${process.env.APP_URL}`, `${process.env.API_URL}`, `${process.env.SERVER_URL}`, `http://13.246.63.33:8080`],
   credentials: true,
   optionSuccessStatus: 200,
 };

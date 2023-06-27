@@ -7,7 +7,7 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/pages/landing.html');
 })
 
-app.get('/login', function (req, res) {
+app.get('/signin', function (req, res) {
     res.sendFile(__dirname + '/pages/login.html');
 })
 
@@ -70,7 +70,7 @@ async function verifyUser(req,res,next){
 
 const getAuth = async (url, header) => {
     try {
-      const response = await fetch(`http://localhost:4001/${url}`, {
+      const response = await fetch(`https://d2lgqlnck8vz6t.cloudfront.net/${url}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
