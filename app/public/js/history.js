@@ -30,7 +30,7 @@ function createHistoryTable(history) {
   place.innerHTML = "";
 
   for (let j = 0; j < history.length; j++) {
-    const winner = history[j].winner;
+    const winner = history[j].winner || "";
     let tr = document.createElement("tr");
     let tdNum = document.createElement("td");
     tdNum.textContent = `Game ${j + 1}`;
@@ -47,7 +47,7 @@ function createHistoryTable(history) {
     }
 
     td.appendChild(ul);
-    td.appendChild(tdNum);
+    tr.appendChild(tdNum);
     tr.appendChild(td);
     place.appendChild(tr);
   }
