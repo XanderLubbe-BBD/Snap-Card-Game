@@ -77,7 +77,7 @@ app.get("/register/:token", verifyAndRetrieveUser, (req, res) => {
     const userName = res.locals.firstName + ' ' + res.locals.lastName;
     try{
         const query = `INSERT INTO Players(username, email) VALUES (?, ?)`;
-        pool.query(query, [playerEmail, userName], (err, rows, fields) => {
+        pool.query(query, [userName, playerEmail], (err, rows, fields) => {
             if (!err) {
                 console.log(rows);
                 const response = {email: rows.email}
