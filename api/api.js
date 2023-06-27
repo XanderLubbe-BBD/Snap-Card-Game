@@ -12,26 +12,24 @@ app.get("/history/:token", verifyEmail, (req, res, next) => {
     const playerEmail = res.locals.email;
     try {
         const query = `
-        SELECT Players.username, Games.game_id, Winner.username AS winner_username
-FROM Game_Players
-INNER JOIN Players ON Players.player_id = Game_Players.player_id
-INNER JOIN Games ON Games.game_id = Game_Players.game_id
-INNER JOIN Players AS Winner ON Winner.player_id = Games.winner_id
-INNER JOIN Players AS WinnerUsername ON WinnerUsername.player_id = Winner.player_id
-WHERE Game_Players.game_id IN (
-    SELECT game_id
+        SELECT Players.username, (SELECT username FROM Players INNER JOIN Games ON Games.game_id = Game_Players.game_id WHERE player_id = (SELECT winner_id FROM Game_Players WHERE player_id = (SELECT player_id FROM Players WHERE email = ?)))
     FROM Game_Players
-    WHERE player_id = (
+    INNER JOIN Players ON Players.player_id = Game_Players.player_id
+    INNER JOIN Games ON Games.game_id = Game_Players.game_id
+    WHERE Game_Players.game_id IN (
+      SELECT game_id
+      FROM Game_Players
+      WHERE player_id = (
         SELECT player_id
         FROM Players
         WHERE email = ?
-    )
-);
+      )
+    );
         `;
 
 
 
-        pool.query(query, [playerEmail], (err, rows) => {
+        pool.query(query, [playerEmail, playerEmail], (err, rows) => {
             if (!err) {
                 const games = [];
                 const gameMap = new Map();
