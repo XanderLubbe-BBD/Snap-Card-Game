@@ -51,11 +51,10 @@ ws.addEventListener('message', function (event) {
         case "playerTurn":
             myTurn = false;
 
-            let topCard2 = document.getElementsByClassName("my-cards");
-            if (topCard2[0] != null) {
-                topCard2[0].classList.remove("highlight");
-            }
-
+            let topCard2 = document.getElementsByClassName("whole-card");
+            topCard2.forEach(card => {
+                card.classList.remove("highlight");
+            });
 
             for (let i = 0; i < playerIds.length; i++) {
                 if (document.getElementsByClassName(`p${i + 1}-cards`)[0] != null) {

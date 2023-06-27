@@ -28,13 +28,9 @@ const activeGames = new Map();
  */
 export async function createGame(playerWS, token) {
     try {
-        let joinCode;
-        if(debugMode){
-            joinCode = "00000";
-        } else {
-            const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-            joinCode = getRandomCode();
-        }
+        const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
+        const joinCode = getRandomCode();
+
 
         const playerInfo = await api.getInfo(token);
         console.log(("Place 1"));
@@ -301,49 +297,51 @@ export async function snap(joinCode, playerWS){
                 activeGames.get(joinCode).snapCalled = true;
                 if (game.started === true) {
                     deckAPI.listPile(game.deck_id).then(async pile => {
-                        const firstCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 1];
-                        const secondCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 2];
-                        if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
-                            for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
-                                player.timesPlayed = 0;
-                            }
-                            if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 52) {
-                                game.lobby.forEach( (value, key) => {
-                                    key.send(JSON.stringify({
-                                        type: "gameOver",
-                                        winner: game.lobby.get(playerWS).username,
-                                    }))
-                                });
-
-                                
-
-                                const finishedGame = {"player": Array.from(game.lobby.values()).map( values => {
-                                    return values.email
-                                }), "winner": game.lobby.get(playerWS).email};
-                                const result = await api.postHistory(finishedGame);
-
-                            } else {
-                                console.log("JackPot!");
-                                deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
-                                    console.log(snapPot);
-                                    const result = activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot.cards);
-                                    activeGames.get(joinCode).lobby.get(playerWS).currentHand = result;
-    
+                        if(pile.piles.SnapPot.cards.length > 2){
+                            const firstCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 1];
+                            const secondCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 2];
+                            if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
+                                for (let [playerSocket, player] of activeGames.get(joinCode).lobby.entries()) {
+                                    player.timesPlayed = 0;
+                                }
+                                if (pile.piles.SnapPot.cards.length + game.lobby.get(playerWS).currentHand.length === 52) {
                                     game.lobby.forEach( (value, key) => {
-                                        if (key === playerWS) {
-                                            key.send(JSON.stringify({
-                                                type: "youWinPot",
-                                                cards: result,
-                                            }))
-                                        } else {
-                                            key.send(JSON.stringify({
-                                                type: "potWon",
-                                                player: game.lobby.get(playerWS).username,
-                                            }))
-                                        }
-                                        
+                                        key.send(JSON.stringify({
+                                            type: "gameOver",
+                                            winner: game.lobby.get(playerWS).username,
+                                        }))
                                     });
-                                });
+
+                                    
+
+                                    const finishedGame = {"player": Array.from(game.lobby.values()).map( values => {
+                                        return values.email
+                                    }), "winner": game.lobby.get(playerWS).email};
+                                    const result = await api.postHistory(finishedGame);
+
+                                } else {
+                                    console.log("JackPot!");
+                                    deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
+                                        console.log(snapPot);
+                                        const result = activeGames.get(joinCode).lobby.get(playerWS).currentHand.concat(snapPot.cards);
+                                        activeGames.get(joinCode).lobby.get(playerWS).currentHand = result;
+        
+                                        game.lobby.forEach( (value, key) => {
+                                            if (key === playerWS) {
+                                                key.send(JSON.stringify({
+                                                    type: "youWinPot",
+                                                    cards: result,
+                                                }))
+                                            } else {
+                                                key.send(JSON.stringify({
+                                                    type: "potWon",
+                                                    player: game.lobby.get(playerWS).username,
+                                                }))
+                                            }
+                                            
+                                        });
+                                    });
+                                }
                             }
                         }
                     });
