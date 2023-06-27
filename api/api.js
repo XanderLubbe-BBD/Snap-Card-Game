@@ -55,8 +55,10 @@ app.get("/info/:token", verifyEmail, (req, res) => {
     console.log(`Email: ${playerEmail}`);
     try{
         const query = `SELECT username FROM Players WHERE email = ?`;
+        console.log(`Running SQL Query: ${query.replace('?', `'${playerEmail}'`)}`);
         pool.query(query, [playerEmail], (err, rows, fields) => {
             if (!err) {
+                console.log(rows);
                 const response = {email: rows.email}
                 res.status(200).send(response);
             } else {
