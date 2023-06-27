@@ -494,7 +494,7 @@ function validatePlayerByWebSocket(joinCode, wss) {
 }
 
 function getPlayerCardCount(lobby){
-    const result = Array.from(lobby.values()).map( async values => {
+    const result = Array.from(lobby.values()).map( values => {
         return {"id": values.username, "cards": values.currentHand ? values.currentHand.length : 0}
     });
 
