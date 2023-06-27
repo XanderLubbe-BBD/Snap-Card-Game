@@ -59,7 +59,7 @@ app.get("/info/:token", verifyEmail, (req, res) => {
         pool.query(query, [playerEmail], (err, rows, fields) => {
             if (!err) {
                 console.log(rows);
-                const response = {email: rows.email}
+                const response = {username: rows.username, valid: true}
                 res.status(200).send(response);
             } else {
                 console.log(err);

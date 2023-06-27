@@ -90,7 +90,7 @@ export async function joinGame(joinCode, playerWS, token){
                     const playerInfo = await api.getInfo(token);
                     console.log("Retrieving payer info");
                     console.log(playerInfo);
-                    if (playerInfo.username) {
+                    if (playerInfo.valid) {
                         console.log("Player exists");
                         activeGames.get(joinCode).lobby.set(playerWS, new Player(playerInfo.username))
     
