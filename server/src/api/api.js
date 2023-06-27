@@ -1,6 +1,7 @@
 import {config} from '../../config/config.js';
 
 export async function postHistory(game) {
+  console.log(game);
     const response = await fetch(`http://apiserver:8082/gameResults`,{
         method: 'POST',
         headers: {

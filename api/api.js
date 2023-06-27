@@ -131,6 +131,8 @@ app.post('/gameResults', (req, res) => {
     const players = req.body.players;
     const winner = req.body.winner;
 
+    console.log(`Winner: ${winner}`);
+
     if (players.length < 2) {
         res.status(400).json({ error: 'At least 2 players are required.' });
         return;
