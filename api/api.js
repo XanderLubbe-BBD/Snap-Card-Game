@@ -134,7 +134,7 @@ app.post('/gameResults', (req, res) => {
     console.log(`Winner: ${winner}`);
 
     if (players.length < 2) {
-        res.status(400).json({ error: 'At least 2 players are required.' });
+        res.status(400).json({ success: false, error: 'At least 2 players are required.' });
         return;
     }
   
@@ -142,7 +142,7 @@ app.post('/gameResults', (req, res) => {
     pool.query(gameQuery, [winner], (error, results) => {
         if (error) {
             console.error('Error inserting game:', error);
-            res.sendStatus(500);
+            res.status(500).send({success: false});
             return;
         }
   
@@ -164,7 +164,7 @@ app.post('/gameResults', (req, res) => {
         pool.query(gamePlayersQuery, values, (error) => {
             if (error) {
             console.error('Error inserting game players:', error);
-            res.sendStatus(500);
+            res.status(500).send({success: false});
             return;
             }
     
