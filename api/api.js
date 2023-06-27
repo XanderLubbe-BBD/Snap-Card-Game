@@ -136,7 +136,7 @@ app.post('/gameResults', (req, res) => {
         return;
     }
   
-    const gameQuery = 'INSERT INTO Games (winner_id) VALUES (?)';
+    const gameQuery = 'INSERT INTO Games (winner_id) VALUES ((SELECT player_id FROM Players WHERE email = ?))';
     pool.query(gameQuery, [winner], (error, results) => {
         if (error) {
             console.error('Error inserting game:', error);
@@ -150,7 +150,7 @@ app.post('/gameResults', (req, res) => {
         const values = [];
     
         for (let i = 0; i < players.length; i++) {
-            placeholders += '(?, ?), ';
+            placeholders += '(?, (SELECT player_id FROM Players WHERE email = ?)), ';
             values.push(gameId, players[i]);
         }
     

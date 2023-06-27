@@ -1,8 +1,9 @@
 import {config} from '../../config/config.js';
 
-export async function postHistory(token) {
-    const response = await fetch(`${config.base_url}/history/${token}`,{
+export async function postHistory(game) {
+    const response = await fetch(`${config.base_url}/gameResults`,{
         method: 'POST',
+        body: JSON.stringify(game)
       })
       
     return response.json()

@@ -9,8 +9,9 @@ const debugMode = false;
  * Desc:
  * Instantiates a player using a destructor
  */
-function Player(username) {
+function Player(username, email) {
     this.username = username;
+    this.email = email;
     this.currentHand = null;
     this.turn = false;
     this.timesPlayed = 0;
@@ -39,7 +40,7 @@ export async function createGame(playerWS, token) {
         
         if (playerInfo.valid) {
             let lobby = new Map();
-            lobby.set(playerWS, new Player(playerInfo.username))
+            lobby.set(playerWS, new Player(playerInfo.username, playerInfo.email))
             deckAPI.getDeck().then( (gameDeck) => {
                 const game = {
                     lobby: lobby,
@@ -92,7 +93,7 @@ export async function joinGame(joinCode, playerWS, token){
                     console.log(playerInfo);
                     if (playerInfo.valid) {
                         console.log("Player exists");
-                        activeGames.get(joinCode).lobby.set(playerWS, new Player(playerInfo.username))
+                        activeGames.get(joinCode).lobby.set(playerWS, new Player(playerInfo.username, playerInfo.email))
     
                         activeGames.get(joinCode).lobby.forEach((value, key) => {
                             key.send(JSON.stringify({
@@ -297,7 +298,7 @@ export async function snap(joinCode, playerWS){
             if (game.snapCalled === false) {
                 activeGames.get(joinCode).snapCalled = true;
                 if (game.started === true) {
-                    deckAPI.listPile(game.deck_id).then(pile => {
+                    deckAPI.listPile(game.deck_id).then(async pile => {
                         const firstCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 1];
                         const secondCard = pile.piles.SnapPot.cards[pile.piles.SnapPot.cards.length - 2];
                         if ((firstCard.value === secondCard.value) || (firstCard.suit === secondCard.suit)) {
@@ -312,11 +313,10 @@ export async function snap(joinCode, playerWS){
                                     }))
                                 });
 
-                                // TODO: send object to api to store in db
-                                // {
-                                //     players: [email@email,email@email,email@email,email@email],
-                                //     winner: email@email
-                                // }
+                                const finishedGame = {"player": Array.from(game.lobby.values()).map( values => {
+                                    return values.emails
+                                }), "winner": game.lobby.get(playerWS).email};
+                                const result = await api.postHistory(finishedGame);
 
                             } else {
                                 console.log("JackPot!");
