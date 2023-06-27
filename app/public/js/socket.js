@@ -304,7 +304,7 @@ ws.addEventListener('message', function (event) {
             break;
         case "history":
             console.log(msg.history);
-            createHistoryTable
+            createHistoryTable(msg.history);
             break;
         case "register":
             if(msg.status){
@@ -329,4 +329,25 @@ function updateCardAmounts() {
     });
 
     document.getElementById("my-count").textContent = elements.length;
+}
+
+
+function createHistoryTable(history){
+    let place = document.getElementById("historyTable");
+
+    place.innerHTML = "";
+
+    let tr = document.createElement("tr");
+    let td = document.createElement("td");
+    let ul = document.createElement("ul");
+    ul.classList.add("name-list");
+    for(let i = 0; i < history.players.length; i++){
+        let li = document.createElement("li");
+        li.textContent = history.players[i];
+        ul.appendChild(li);
+    }
+
+    td.appendChild(ul);
+    tr.appendChild(td);
+    place.appendChild(tr);
 }
