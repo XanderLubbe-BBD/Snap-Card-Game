@@ -311,6 +311,13 @@ export async function snap(joinCode, playerWS){
                                         winner: game.lobby.get(playerWS).username,
                                     }))
                                 });
+
+                                // TODO: send object to api to store in db
+                                // {
+                                //     players: [email@email,email@email,email@email,email@email],
+                                //     winner: email@email
+                                // }
+
                             } else {
                                 console.log("JackPot!");
                                 deckAPI.drawPile(game.deck_id, pile.piles.SnapPot.cards.length).then(snapPot => {
