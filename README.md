@@ -58,6 +58,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 ### 3. Adding environment variables
 
+Add an `.env` file in the `server` folder containing the following: <br/>
+
+API_URL = http://localhost:8082 <br/> <br/>
+
 Add an `.env` file in the `api` folder containing the following: <br/> 
 
   HOST: your mysql hostname<br/>
@@ -78,10 +82,6 @@ API_PORT=4001 <br/>
 APP_URL= http://localhost:8080 <br/>
 API_URL= http://localhost:8082 <br/>
 SERVER_URL= http://localhost:8081 <br/>
-
-Add an `.env` file in the `server` folder containing the following: <br/>
-
-API_URL = http://localhost:8082
 
 ### 4. Installing dependencies
 
