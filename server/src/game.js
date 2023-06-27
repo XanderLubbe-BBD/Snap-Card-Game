@@ -87,7 +87,7 @@ export async function joinGame(joinCode, playerWS, token){
                 console.log("Player is not yet in game");
                 if (lobby.size < 4) {
                     console.log("Game has enough space for player to join");
-                    const playerInfo = api.getInfo(token);
+                    const playerInfo = await api.getInfo(token);
                     console.log("Retrieving payer info");
                     console.log(playerInfo);
                     if (playerInfo.username) {
