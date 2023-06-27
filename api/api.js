@@ -72,6 +72,34 @@ app.get("/info/:token", verifyEmail, (req, res) => {
     }
 });
 
+app.get("/register/:token", verifyAndRetrieveUser, (req, res) => {
+    const playerEmail = res.locals.email;
+    const userName = res.locals.firstName + ' ' + res.locals.lastName;
+    try{
+        const query = `INSERT INTO Players(username, email) VALUES (?, ?)`;
+        pool.query(query, [playerEmail, userName], (err, rows, fields) => {
+            if (!err) {
+                console.log(rows);
+                const response = {email: rows.email}
+                res.status(200).send(response);
+            } else {
+                console.log(err);
+                res.status(400).send(fields);
+            };
+        });
+    }
+    catch(error){
+    }
+})
+
+async function verifyAndRetrieveUser(req, res, next){
+    const token = req.params.token;
+    const result = await getAuth("user", token);
+    res.locals.email = result.email;
+    res.locals.firstName = result.firstName;
+    res.local.lastName = result.lastName;
+    next();
+}
 
 async function verifyEmail(req, res, next){
     const token = req.params.token;
@@ -96,3 +124,4 @@ const getAuth = async (url, header) => {
       console.log(error);
     }
   };
+
