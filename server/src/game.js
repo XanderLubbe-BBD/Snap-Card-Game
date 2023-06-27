@@ -87,7 +87,7 @@ export async function joinGame(joinCode, playerWS, token){
                     
                     const playerInfo = api.getInfo(token);
                     if (playerInfo.username) {
-                        activeGames.get(joinCode).lobby.set(playerWS, new Player(email))
+                        activeGames.get(joinCode).lobby.set(playerWS, new Player(playerInfo.username))
     
                         activeGames.get(joinCode).lobby.forEach((value, key) => {
                             key.send(JSON.stringify({
