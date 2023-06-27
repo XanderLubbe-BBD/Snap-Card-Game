@@ -49,6 +49,25 @@ app.get("/history/:token",verifyEmail, (req, res) => {
     }
 });
 
+app.get("/info/:token", verifyEmail, (req, res) => {
+    const playerEmail = res.locals.email;
+    try{
+    const query = `SELECT username FROM Players WHERE email = ?`;
+    pool.query(query, [playerEmail], (err, rows, fields) => {
+        if (!err) {
+            const response = {email: rows.email}
+            res.status(200).send(response);
+        } else {
+            console.log(err);
+            res.status(400).send(fields);
+        };
+    });
+    }
+    catch{
+        
+    }
+});
+
 
 async function verifyEmail(req, res, next){
     const token = req.params.token;
