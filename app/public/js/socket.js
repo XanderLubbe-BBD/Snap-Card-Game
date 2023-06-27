@@ -52,7 +52,7 @@ ws.addEventListener('message', function (event) {
             myTurn = false;
 
             let topCard2 = document.getElementsByClassName("whole-card");
-            topCard2.forEach(card => {
+            [...topCard2].forEach(card => {
                 card.classList.remove("highlight");
             });
 
