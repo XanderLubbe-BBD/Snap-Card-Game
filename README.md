@@ -3,6 +3,30 @@
 
 ## Running locally
 
+Add an `.env` file in the api folder containing the following: <br/> <br/>
+
+HOST: <br/>
+USER: <br/>
+PASSWORD: <br/>
+DATABASE: database for game <br/>
+
+AUTH_URL= http://localhost:4001 <br/> <br/>
+
+
+Add an `.env` file in the auth-server folder containing the following: <br/>
+
+HOST: <br/>
+USER: <br/>
+DATABASE: <br/>
+PASSWORD: <br/>
+
+TOKEN_KEY = <br/>
+API_PORT=4001 <br/>
+APP_URL= http://localhost:8080 <br/>
+API_URL= http://localhost:8082 <br/>
+SERVER_URL= http://localhost:8081 <br/>
+
+
 1. Run `npm install` in the "api" directory.
 2. Run `npm install` in the "server" directory.
 3. Run `npm install` in the "app" directory.
