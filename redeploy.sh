@@ -9,18 +9,18 @@ sudo docker rm appserver;
 
 git pull;
 
-sudo cd auth-server;
+cd auth-server;
 sudo docker build -t auth .;
-sudo docker run -p 4001:4001 --network Snapynetwork --name authserver --tld auth;
+sudo docker run -d -p 4001:4001 --network Snapynetwork --name authserver -tld auth;
 
-sudo cd ../server;
+cd ../server;
 sudo docker build -t server .;
-sudo docker run -p 8081:8081 --network Snapynetwork --name serverurl --tld server;
+sudo docker run -d -p 8081:8081 --network Snapynetwork --name serverurl -tld server;
 
-sudo cd ../api;
+cd ../api;
 sudo docker build -t api .;
-sudo docker run --network Snapynetwork --name apiserver --tld api;
+sudo docker run -d --network Snapynetwork --name apiserver -tld api;
 
-sudo cd ../app;
+cd ../app;
 sudo docker build -t app .;
-sudo docker run -p 8080:8080 --network Snapynetwork --name appserver --tld app;
+sudo docker run -d -p 8080:8080 --network Snapynetwork --name appserver -tld app;
