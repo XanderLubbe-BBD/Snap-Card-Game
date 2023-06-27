@@ -7,7 +7,7 @@ window.onload = function (event) {
       type: "history",
       token: sessionStorage.getItem("token")
     }
-    sendMessage(msg);
+    ws.send(JSON.stringify(msg));
   });
 
   ws.addEventListener('message', function (event) {
@@ -42,8 +42,4 @@ function createHistoryTable(history) {
   td.appendChild(ul);
   tr.appendChild(td);
   place.appendChild(tr);
-}
-
-function sendMessage(data) {
-  ws.send(JSON.stringify(data));
 }
