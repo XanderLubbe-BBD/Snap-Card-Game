@@ -11,13 +11,19 @@ app.listen(8082, () => {
 app.get("/history/:token",verifyEmail, (req, res, next) => {
     const playerEmail = res.locals.email;
     try{
-    const query = `SELECT Players.username 
-    FROM Game_Players 
-    INNER JOIN Players 
-    ON Players.player_id = Game_Players.player_id 
-    WHERE game_id IN 
-    (SELECT game_id FROM Game_Players 
-        WHERE player_id = (SELECT player_id FROM Players WHERE email = ?))`;
+    const query = `SELECT Players.username, Games.winner_id
+    FROM Game_Players
+    INNER JOIN Players ON Players.player_id = Game_Players.player_id
+    INNER JOIN Games ON Games.game_id = Game_Players.game_id
+    WHERE Game_Players.game_id IN (
+      SELECT game_id
+      FROM Game_Players
+      WHERE player_id = (
+        SELECT player_id
+        FROM Players
+        WHERE email = ?
+      )
+    );`;
     pool.query(query, [playerEmail], (err, rows, fields) => {
         if (!err) {
             let obj = [];
