@@ -9,7 +9,7 @@ ws.addEventListener('message', function (event) {
     switch (msg.type) {
         case "create":
             jCode = msg.joinCode;
-
+            myId = msg.player;
             document.getElementById("join-code").textContent = jCode;
             break;
         case "join":
