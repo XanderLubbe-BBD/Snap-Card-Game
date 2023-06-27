@@ -30,13 +30,17 @@ function createHistoryTable(history) {
   place.innerHTML = "";
 
   for (let j = 0; j < history.length; j++) {
+    const winner = history[j].players[0];
     let tr = document.createElement("tr");
     let td = document.createElement("td");
     let ul = document.createElement("ul");
     ul.classList.add("name-list");
-    for (let i = 0; i < history[j].players.length; i++) {
+    for (let i = 1; i < history[j].players.length; i++) {
       let li = document.createElement("li");
       li.textContent = history[j].players[i];
+      if(winner == history[j].players[i]){
+        li.classList("winner");
+      }
       ul.appendChild(li);
     }
 
