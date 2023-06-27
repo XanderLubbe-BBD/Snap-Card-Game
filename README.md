@@ -3,12 +3,17 @@
 
 ## Running locally
 
-### 1. Creating the databases
+### 1. Checkout the correct branch
+
+Checkout the branch called `local`. 
+Do not checkout `main`.
+
+### 2. Creating the databases
 
 Create two mysql databases: one  for the game and one for authentication. <br/>
 Run the following scripts to create the databases:
 
-### 2. Adding environment variables
+### 3. Adding environment variables
 
 Add an `.env` file in the `api` folder containing the following: <br/> 
 
@@ -31,7 +36,7 @@ APP_URL= http://localhost:8080 <br/>
 API_URL= http://localhost:8082 <br/>
 SERVER_URL= http://localhost:8081 <br/>
 
-### 3. Installing dependencies
+### 4. Installing dependencies
 
 1. Run `npm install` in the "api" directory.
 2. Run `npm install` in the "server" directory.
