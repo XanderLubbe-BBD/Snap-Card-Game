@@ -5,7 +5,7 @@ let myId = "";
 let waitingToJoin = false;
 let numPlayers = "";
 
-const debug = true;
+const debug = false;
 
 if (debug) {
     fetch("https://randomuser.me/api/").then((response) => {
