@@ -13,25 +13,27 @@ Do not checkout `main`.
 Create two mysql databases: one  for the game and one for authentication. <br/>
 Run the following scripts to create the databases:
 
+CREATE SnapHistoryDB;
+
 USE SnapHistoryDB;
 
--- Create the Players table
+-- Create the Players table <br/>
 CREATE TABLE Players (
   player_id INT NOT NULL AUTO_INCREMENT,
   username VARCHAR(255),
   email VARCHAR(255),
   PRIMARY KEY (player_id)
-);
+);<br/><br/>
 
--- Create the Games table
+-- Create the Games table <br/>
 CREATE TABLE Games (
   game_id INT NOT NULL AUTO_INCREMENT,
   winner_id INT,
   PRIMARY KEY (game_id),
   FOREIGN KEY (winner_id) REFERENCES Players(player_id)
-);
+); <br/><br/>
 
--- Create the Game_Players table
+-- Create the Game_Players table <br/>
 CREATE TABLE Game_Players (
   gamePlayersId INT NOT NULL AUTO_INCREMENT,
   game_id INT,
@@ -39,7 +41,7 @@ CREATE TABLE Game_Players (
   PRIMARY KEY(gamePlayersId),
   FOREIGN KEY (game_id) REFERENCES Games(game_id),
   FOREIGN KEY (player_id) REFERENCES Players(player_id)
-);
+); <br/><br/>
 
 CREATE DATABASE AuthServerDB;
 
