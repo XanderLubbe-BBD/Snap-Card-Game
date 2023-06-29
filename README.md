@@ -1,5 +1,7 @@
 # Snap (Card Game)
 <br>
+## Requirements
+Node.js 18
 
 ## Running locally
 
